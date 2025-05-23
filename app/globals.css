@@ -74,8 +74,6 @@ progress::-webkit-progress-value {
   }
 }
 
-
-
 @layer base {
   * {
     @apply border-border;

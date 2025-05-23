@@ -3,12 +3,12 @@ import { ConfigProps } from "./types/config";
 
 const config = {
   // REQUIRED
-  appName: "ShipFast",
+  appName: "Serendipity Dating",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
-    "The NextJS boilerplate with all you need to build your SaaS, AI tool, or any other web app.",
+    "Dating with balance and authenticity. The first dating app designed for true balance across communities, creating an equitable platform for authentic connections.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
-  domainName: "shipfa.st",
+  domainName: "serendipitydating.io", // Update with your actual domain
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (resend.supportEmail) otherwise customer support won't work.
     id: "",
@@ -16,82 +16,128 @@ const config = {
     onlyShowOnRoutes: ["/"],
   },
   stripe: {
-    // Create multiple plans in your Stripe dashboard, then add them here. You can add as many plans as you want, just make sure to add the priceId
+    // For future monetization - keeping minimal for now since focus is email collection
     plans: [
       {
-        // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
         priceId:
           process.env.NODE_ENV === "development"
-            ? "price_1Niyy5AxyNprDp7iZIqEyD2h"
-            : "price_456",
-        //  REQUIRED - Name of the plan, displayed on the pricing page
-        name: "Starter",
-        // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
-        description: "Perfect for small projects",
-        // The price you want to display, the one user will be charged on Stripe.
-        price: 99,
-        // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
-        priceAnchor: 149,
+            ? "price_serendipity_dev"
+            : "price_serendipity_prod",
+        name: "Early Access",
+        description: "Be among the first to experience authentic dating",
+        price: 0, // Free for early access
+        priceAnchor: 29,
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-        ],
-      },
-      {
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1O5KtcAxyNprDp7iftKnrrpw"
-            : "price_456",
-        // This plan will look different on the pricing page, it will be highlighted. You can only have one plan with isFeatured: true
-        isFeatured: true,
-        name: "Advanced",
-        description: "You need more power",
-        price: 149,
-        priceAnchor: 299,
-        features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "Balanced community matching" },
+          { name: "Real-life event invitations" },
+          { name: "Anti-ghosting features" },
+          { name: "Transparent algorithms" },
+          { name: "Community-driven development" },
         ],
       },
     ],
   },
   aws: {
     // If you use AWS S3/Cloudfront, put values in here
-    bucket: "bucket-name",
-    bucketUrl: `https://bucket-name.s3.amazonaws.com/`,
-    cdn: "https://cdn-id.cloudfront.net/",
+    bucket: "serendipity-assets",
+    bucketUrl: `https://serendipity-assets.s3.amazonaws.com/`,
+    cdn: "https://cdn-serendipity.cloudfront.net/",
   },
   resend: {
     // REQUIRED — Email 'From' field to be used when sending magic login links
-    fromNoReply: `ShipFast <noreply@resend.shipfa.st>`,
+    fromNoReply: `Serendipity <noreply@serendipitydating.com>`,
     // REQUIRED — Email 'From' field to be used when sending other emails, like abandoned carts, updates etc..
-    fromAdmin: `Marc at ShipFast <marc@resend.shipfa.st>`,
-    // Email shown to customer if need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
-    supportEmail: "marc.louvion@gmail.com",
+    fromAdmin: `Team Serendipity <hello@serendipitydating.com>`,
+    // Email shown to customer if need support.
+    supportEmail: "support@serendipitydating.io",
   },
   colors: {
-    // REQUIRED — The DaisyUI theme to use (added to the main layout.js). Leave blank for default (light & dark mode). If you any other theme than light/dark, you need to add it in config.tailwind.js in daisyui.themes.
+    // Using light theme as base with rose/violet gradient accents
     theme: "light",
-    // REQUIRED — This color will be reflected on the whole app outside of the document (loading bar, Chrome tabs, etc..). By default it takes the primary color from your DaisyUI theme (make sure to update your the theme name after "data-theme=")
-    // OR you can just do this to use a custom color: main: "#f37055". HEX only.
-    main: themes["light"]["primary"],
+    // Primary brand color - rose gradient
+    main: "#e11d48", // rose-600
   },
   auth: {
-    // REQUIRED — the path to log in users. It's use to protect private routes (like /dashboard). It's used in apiClient (/libs/api.js) upon 401 errors from our API
+    // REQUIRED — the path to log in users (for future app functionality)
     loginUrl: "/signin",
-    // REQUIRED — the path you want to redirect users after successfull login (i.e. /dashboard, /private). This is normally a private page for users to manage their accounts. It's used in apiClient (/libs/api.js) upon 401 errors from our API & in ButtonSignin.js
-    callbackUrl: "/dashboard",
+    // REQUIRED — the path you want to redirect users after successful login
+    callbackUrl: "/waitlist-success",
   },
-} as ConfigProps;
+  // Serendipity-specific configuration
+  serendipity: {
+    // Social media and external links
+    twitter: "https://twitter.com/serendipity_dev",
+    instagram: "https://instagram.com/serendipity.dating",
+    // Event cities for the events section
+    eventCities: [
+      {
+        name: "New York City",
+        date: "June (TBD)",
+        title: "Rooftop Mixer in Manhattan",
+        description:
+          "Join our founders for an evening of meaningful conversations and unexpected connections.",
+        image:
+          "https://images.unsplash.com/photo-1581351721010-8cf859cb14a4?q=80&w=1000&auto=format&fit=crop",
+        interested: 48,
+        featured: true,
+      },
+      {
+        name: "Chicago",
+        date: "July (TBD)",
+        title: "Lakefront Social",
+        image:
+          "https://images.unsplash.com/photo-1467226632440-65f0b4957563?q=80&w=1000&auto=format&fit=crop",
+      },
+      {
+        name: "Los Angeles",
+        date: "August (TBD)",
+        title: "Beachside Connections",
+        image:
+          "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?q=80&w=1000&auto=format&fit=crop",
+      },
+      {
+        name: "Austin",
+        date: "September (TBD)",
+        title: "Margaritas and Meetups",
+        image:
+          "https://images.unsplash.com/photo-1531218150217-54595bc2b934?q=80&w=1000&auto=format&fit=crop",
+      },
+      {
+        name: "Seattle",
+        date: "September (TBD)",
+        title: "Innovation Hub Social",
+        image:
+          "https://images.unsplash.com/photo-1502175353174-a7a70e73b362?q=80&w=1000&auto=format&fit=crop",
+      },
+    ],
+    // Marketing incentives and lead magnets
+    leadMagnets: {
+      primary:
+        "Get exclusive early access and help shape the future of authentic dating",
+      secondary:
+        "Join 500+ forward-thinking singles building a better dating experience",
+      urgency: "Limited founding member spots available",
+    },
+  },
+} as ConfigProps & {
+  serendipity: {
+    twitter: string;
+    instagram: string;
+    eventCities: Array<{
+      name: string;
+      date: string;
+      title: string;
+      description?: string;
+      image: string;
+      interested?: number;
+      featured?: boolean;
+    }>;
+    leadMagnets: {
+      primary: string;
+      secondary: string;
+      urgency: string;
+    };
+  };
+};
 
 export default config;
