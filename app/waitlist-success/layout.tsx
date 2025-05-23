@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactNode } from "react";
 import { Suspense } from "react";
 import { Navbar } from "@/components/landing/Navbar";

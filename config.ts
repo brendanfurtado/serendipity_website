@@ -1,6 +1,9 @@
 import themes from "daisyui/src/theming/themes";
 import { ConfigProps } from "./types/config";
 
+// Helper to determine if we're in development mode
+const isDev = process.env.NODE_ENV === "development";
+
 const config = {
   // REQUIRED
   appName: "Serendipity Dating",
@@ -44,12 +47,18 @@ const config = {
     cdn: "https://cdn-serendipity.cloudfront.net/",
   },
   resend: {
-    // REQUIRED — Email 'From' field to be used when sending magic login links
-    fromNoReply: `Serendipity <noreply@serendipitydating.com>`,
-    // REQUIRED — Email 'From' field to be used when sending other emails, like abandoned carts, updates etc..
-    fromAdmin: `Team Serendipity <hello@serendipitydating.com>`,
+    // Using resend.dev as the email domain in development
+    // In production, you would use your own verified domain
+    fromNoReply: isDev
+      ? `Serendipity <onboarding@resend.dev>`
+      : `Serendipity <noreply@serendipitydating.com>`,
+    fromAdmin: isDev
+      ? `Team Serendipity <onboarding@resend.dev>`
+      : `Team Serendipity <hello@serendipitydating.com>`,
     // Email shown to customer if need support.
-    supportEmail: "support@serendipitydating.io",
+    supportEmail: isDev
+      ? "onboarding@resend.dev"
+      : "support@serendipitydating.io",
   },
   colors: {
     // Using light theme as base with rose/violet gradient accents

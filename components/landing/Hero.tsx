@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import config from "@/config";
+import { LiveCounter } from "./LiveCounter";
 
 export function Hero() {
   return (
@@ -12,7 +13,7 @@ export function Hero() {
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
           <div className="flex flex-col justify-center space-y-4">
             <div className="inline-block rounded-lg bg-rose-100 px-3 py-1 text-sm text-rose-700">
-              A New Era of Dating
+              Bringing back the REAL way to meet your match.
             </div>
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
               Dating with <span className="text-rose-500">Balance</span> and{" "}
@@ -44,19 +45,14 @@ export function Hero() {
                 <div className="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-rose-200"></div>
                 <div className="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-violet-200"></div>
               </div>
-              <div className="text-sm text-gray-500">
-                Join{" "}
-                {config.serendipity?.leadMagnets?.secondary?.split(" ")[0] ||
-                  "500+"}{" "}
-                early adopters
-              </div>
+              <LiveCounter />
             </div>
           </div>
           <div className="flex items-center justify-center">
             <div className="relative w-full max-w-[500px] aspect-square">
               <div className="absolute inset-0 bg-gradient-to-r from-rose-200 to-violet-200 rounded-full blur-3xl opacity-20"></div>
               <Image
-                src={`/herocouple.jpg`}
+                src="/herocouple.jpg"
                 alt="Couple enjoying a date"
                 className="relative z-10 w-full h-full object-cover rounded-2xl shadow-xl"
                 width={500}

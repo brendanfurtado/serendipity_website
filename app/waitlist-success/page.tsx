@@ -1,17 +1,19 @@
+"use client";
+
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
-import { Twitter, Instagram } from "lucide-react";
-
-export const metadata = getSEOTags({
-  title: `Thank You | ${config.appName}`,
-  description:
-    "You're on the waitlist! Thank you for joining the Serendipity community.",
-  canonicalUrlRelative: "/waitlist-success",
-});
+import { Twitter, Instagram, Users } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 export default function WaitlistSuccess() {
+  // Use the search params hook to get the total count
+  const searchParams = useSearchParams();
+  const totalSignups = searchParams?.get("total")
+    ? parseInt(searchParams.get("total")!, 10)
+    : null;
+
   return (
     <main className="min-h-screen py-12 md:py-24 bg-white">
       <div className="container px-4 md:px-6 max-w-3xl mx-auto">
@@ -36,11 +38,21 @@ export default function WaitlistSuccess() {
             You&apos;re on the Waitlist!
           </h1>
 
-          <p className="text-gray-600 md:text-lg mb-8">
+          <p className="text-gray-600 md:text-lg mb-4">
             Thank you for joining the {config.appName} community. We&apos;re
             building something special, and we&apos;re excited to have you along
             for the journey.
           </p>
+
+          {totalSignups && (
+            <div className="flex items-center justify-center gap-2 mb-8 text-xl">
+              <Users className="h-5 w-5 text-violet-500" />
+              <span>
+                <span className="font-bold text-rose-500">#{totalSignups}</span>{" "}
+                on our waitlist
+              </span>
+            </div>
+          )}
 
           <div className="space-y-6">
             <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">

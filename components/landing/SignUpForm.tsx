@@ -3,36 +3,53 @@
 import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import config from "@/config";
+import { LiveCounter } from "./LiveCounter";
+import { useRouter } from "next/navigation";
 
 export function SignUpForm() {
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call to your backend
-      // Example:
-      // const response = await fetch('/api/waitlist', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ email, gender }),
-      // });
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, gender }),
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to join waitlist");
+      }
 
-      // Set submitted to true to show success message
+      const data = await response.json();
+
+      // Set submitted to true to show success message temporarily
       setSubmitted(true);
+
+      // Redirect to success page after a brief delay, passing the total signup count
+      setTimeout(() => {
+        router.push(`/waitlist-success?total=${data.totalSignups || ""}`);
+      }, 1500);
+
+      // If there was an email error but signup succeeded, show a warning
+      if (data.emailError) {
+        console.warn(
+          "Signup successful but confirmation email could not be sent."
+        );
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
-      // Handle error (show message, etc)
+      alert("There was an error joining the waitlist. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -145,8 +162,8 @@ export function SignUpForm() {
                 </div>
                 <p className="text-xs text-gray-500 text-center pt-2">
                   By joining, you agree to our Terms of Service and Privacy
-                  Policy. We`&apos;`ll notify you when we`&apos;`re ready to
-                  welcome you to our balanced community.
+                  Policy. We&apos;ll notify you when we&apos;re ready to welcome
+                  you to our balanced community.
                 </p>
               </div>
             </form>
@@ -171,8 +188,8 @@ export function SignUpForm() {
                 Thank you for joining!
               </h3>
               <p className="mt-2 text-sm text-gray-600">
-                We`&apos;`ve added you to our waitlist. We`&apos;`ll notify you
-                when we`&apos;`re ready to welcome you to our community!
+                We&apos;ve added you to our waitlist. We&apos;ll notify you when
+                we&apos;re ready to welcome you to our community!
               </p>
             </div>
           )}
@@ -182,10 +199,7 @@ export function SignUpForm() {
               <div className="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-violet-200"></div>
               <div className="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-rose-200"></div>
             </div>
-            <div className="text-sm text-gray-500">
-              {config.serendipity?.leadMagnets?.urgency ||
-                "+500 people already on the waitlist"}
-            </div>
+            <LiveCounter suffix="people already on the waitlist" />
           </div>
         </div>
       </div>
