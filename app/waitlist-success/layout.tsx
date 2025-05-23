@@ -1,24 +1,22 @@
 import { ReactNode } from "react";
 import { Suspense } from "react";
-import Footer from "@/components/Footer";
 import { Navbar } from "@/components/landing/Navbar";
+import Footer from "@/components/Footer";
 
-export default async function LayoutBlog({
+export default function WaitlistSuccessLayout({
   children,
 }: {
   children: ReactNode;
 }) {
   return (
-    <div>
+    <>
       <Suspense>
         <Navbar />
       </Suspense>
 
-      <main className="min-h-screen max-w-6xl mx-auto p-8">{children}</main>
-
-      <div className="h-24" />
+      {children}
 
       <Footer />
-    </div>
+    </>
   );
 }

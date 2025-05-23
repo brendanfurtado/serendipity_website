@@ -11,7 +11,7 @@ import { SignUpForm } from "./SignUpForm";
 
 export function LandingPage() {
   return (
-    <>
+    <div className="pt-4">
       <Hero />
       <HowItWorks />
       <Features />
@@ -19,8 +19,6 @@ export function LandingPage() {
       <Community />
       <TransparencySection />
       <SignUpForm />
-    </>
+    </div>
   );
 }
-
-export default LandingPage;
