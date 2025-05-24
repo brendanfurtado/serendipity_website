@@ -60,7 +60,8 @@ export function EventsSection() {
       id="events"
       className="w-full py-12 md:py-24 bg-gradient-to-br from-violet-50 via-white to-rose-50"
     >
-      <div className="container px-4 md:px-6">
+      {/* Added mx-auto and max-w-screen-xl for consistent container sizing */}
+      <div className="container px-4 md:px-6 mx-auto max-w-screen-xl">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
           <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-violet-600 px-4 py-1.5 text-sm font-medium text-white">
             <Sparkles className="h-4 w-4" />
@@ -155,41 +156,6 @@ export function EventsSection() {
             </div>
           ))}
         </div>
-
-        {/* <div className="mt-12 flex flex-col items-center">
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 max-w-2xl w-full">
-            <div className="flex flex-col md:flex-row gap-6 items-center text-center md:text-left">
-              <div className="md:w-1/3">
-                <div className="relative w-32 h-32 mx-auto">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-rose-400 to-violet-500 blur-md opacity-30"></div>
-                  <div className="relative bg-white rounded-full p-1 h-full w-full">
-                    <Image
-                      src="/images/founders.jpg"
-                      alt="Founders"
-                      className="rounded-full w-full h-full object-cover"
-                      width={128}
-                      height={128}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="md:w-2/3">
-                <h3 className="text-xl font-bold mb-2">Meet Our Founders</h3>
-                <p className="text-gray-600 mb-4">
-                  &quot;We believe that the most meaningful connections happen
-                  organically, in person. Our events create the perfect
-                  environment for serendipity to work its magic.&quot;
-                </p>
-                <a
-                  href="#"
-                  className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-rose-500 to-violet-600 px-5 py-2.5 text-sm font-medium text-white shadow transition-colors hover:from-rose-600 hover:to-violet-700"
-                >
-                  View All Upcoming Events
-                </a>
-              </div>
-            </div>
-          </div>
-        </div> */}
       </div>
     </section>
   );

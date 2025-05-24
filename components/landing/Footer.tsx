@@ -8,7 +8,8 @@ import config from "@/config";
 export function Footer() {
   return (
     <footer className="w-full py-12 bg-gray-900 text-white">
-      <div className="container px-4 md:px-6">
+      {/* Added mx-auto and max-w-screen-xl for consistent container sizing */}
+      <div className="container px-4 md:px-6 mx-auto max-w-screen-xl">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <h3 className="text-lg font-bold">Serendipity</h3>

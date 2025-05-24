@@ -1,3 +1,4 @@
+// components/landing/Hero.tsx
 "use client";
 
 import React from "react";
@@ -9,7 +10,8 @@ import { LiveCounter } from "./LiveCounter";
 export function Hero() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-white to-rose-50">
-      <div className="container px-4 md:px-6">
+      {/* Changed from 'container px-4 md:px-6' to add mx-auto and max-w settings */}
+      <div className="container px-4 md:px-6 mx-auto max-w-screen-xl">
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
           <div className="flex flex-col justify-center space-y-4">
             <div className="inline-block rounded-lg bg-rose-100 px-3 py-1 text-sm text-rose-700">

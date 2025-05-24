@@ -60,7 +60,8 @@ export function SignUpForm() {
       id="join-waitlist"
       className="w-full py-12 md:py-24 bg-gradient-to-b from-white to-rose-50"
     >
-      <div className="container px-4 md:px-6">
+      {/* Added mx-auto and max-w-screen-xl for consistent container sizing */}
+      <div className="container px-4 md:px-6 mx-auto max-w-screen-xl">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="inline-block rounded-lg bg-rose-100 px-3 py-1 text-sm text-rose-700">
             Join the Movement

@@ -14,7 +14,8 @@ export default async function LayoutBlog({
         <Navbar />
       </Suspense>
 
-      <main className="min-h-screen max-w-6xl mx-auto p-8">{children}</main>
+      {/* Updated max-width and added mx-auto for consistent container sizing */}
+      <main className="min-h-screen max-w-screen-xl mx-auto p-8">{children}</main>
 
       <div className="h-24" />
 

@@ -60,7 +60,8 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+      {/* Added mx-auto and max-w-screen-xl for consistent container sizing */}
+      <div className="container flex h-16 items-center justify-between px-4 md:px-6 mx-auto max-w-screen-xl">
         <div className="flex items-center">
           <Link href="/" className="text-2xl font-bold tracking-tighter">
             <span className="text-rose-500">Seren</span>
@@ -113,7 +114,7 @@ export function Navbar() {
         </div>
       </div>
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-b pb-4 px-4">
+        <div className="md:hidden bg-white border-b pb-4 px-4 mx-auto max-w-screen-xl">
           <nav className="flex flex-col space-y-3">
             {navigationLinks.map((link) => (
               <Link

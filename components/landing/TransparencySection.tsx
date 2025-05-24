@@ -7,7 +7,8 @@ import config from "@/config";
 export function TransparencySection() {
   return (
     <section className="w-full py-12 md:py-24 bg-white">
-      <div className="container px-4 md:px-6">
+      {/* Added mx-auto and max-w-screen-xl for consistent container sizing */}
+      <div className="container px-4 md:px-6 mx-auto max-w-screen-xl">
         <div className="max-w-3xl mx-auto">
           <div className="flex flex-col items-center text-center space-y-4 mb-8">
             <div className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700">

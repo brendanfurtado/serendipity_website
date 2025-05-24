@@ -17,7 +17,8 @@ export default function HeaderBlog() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-sm">
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+      {/* Added mx-auto and max-w-screen-xl for consistent container sizing */}
+      <div className="container flex h-16 items-center justify-between px-4 md:px-6 mx-auto max-w-screen-xl">
         {/* Logo/Name */}
         <div className="flex lg:flex-1">
           <Link
