@@ -12,12 +12,12 @@ import config from "@/config";
 // You are an excellent lawyer.
 
 // I need your help to write a simple privacy policy for my website. Here is some context:
-// - Website: https://shipfa.st
-// - Name: ShipFast
-// - Description: A JavaScript code boilerplate to help entrepreneurs launch their startups faster
+// - Website: https://serendipitydating.io
+// - Name: Serendipity Dating
+// - Description: A dating app based on a balance between communities to create an equitable platform for authentic connections. The first dating app designed for true balance across communities, creating an equitable platform for authentic connections.
 // - User data collected: name, email and payment information
 // - Non-personal data collection: web cookies
-// - Purpose of Data Collection: Order processing
+// - Purpose of Data Collection: Email collection for user updates and future onboarding
 // - Data sharing: we do not share the data with any other parties
 // - Children's Privacy: we do not collect any data from children
 // - Updates to the Privacy Policy: users will be updated by email
