@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     const country = headers.get("cf-ipcountry") || null; // Cloudflare provides this
 
     // Store the submission using our function
-    const supabase = createClient();
+    const supabase = await createClient(); // Add await here
     const { data: signupData, error: signupError } = await supabase.rpc(
       "add_waitlist_signup",
       {

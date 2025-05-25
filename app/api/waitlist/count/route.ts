@@ -3,7 +3,7 @@ import { createClient } from "@/libs/supabase/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient(); // Add await here
 
     // Call the stored function to get the count
     const { data, error } = await supabase.rpc("get_signup_count");

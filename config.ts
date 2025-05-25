@@ -98,7 +98,7 @@ const config = {
           "https://images.unsplash.com/photo-1467226632440-65f0b4957563?q=80&w=1000&auto=format&fit=crop",
       },
       {
-        name: "Los Angeles",
+        name: "San Francisco",
         date: "August (TBD)",
         title: "Beachside Connections",
         image:

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Instagram, Twitter, Facebook } from "lucide-react";
+import { Instagram, Twitter } from "lucide-react";
 import config from "@/config";
 
 export function Footer() {
@@ -34,9 +34,6 @@ export function Footer() {
                 className="text-gray-400 hover:text-white"
               >
                 <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <Facebook className="h-5 w-5" />
               </a>
             </div>
           </div>

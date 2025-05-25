@@ -12,54 +12,54 @@ import config from "@/config";
 
 // Crisp customer chat support:
 // This component is separated from ClientLayout because it needs to be wrapped with <SessionProvider> to use useSession() hook
-const CrispChat = (): null => {
-  const pathname = usePathname();
+// const CrispChat = (): null => {
+  // const pathname = usePathname();
 
-  const supabase = createClient();
-  const [data, setData] = useState<{ user: User }>(null);
+  // const supabase = createClient();
+  // const [data, setData] = useState<{ user: User }>(null);
 
   // This is used to get the user data from Supabase Auth (if logged in) => user ID is used to identify users in Crisp
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  // useEffect(() => {
+  //   const getUser = async () => {
+  //     const {
+  //       data: { user },
+  //     } = await supabase.auth.getUser();
 
-      if (user) {
-        setData({ user });
-      }
-    };
-    getUser();
-  }, []);
+  //     if (user) {
+  //       setData({ user });
+  //     }
+  //   };
+  //   getUser();
+  // }, []);
 
-  useEffect(() => {
-    if (config?.crisp?.id) {
-      // Set up Crisp
-      Crisp.configure(config.crisp.id);
+  // useEffect(() => {
+  //   if (config?.crisp?.id) {
+  //     // Set up Crisp
+  //     Crisp.configure(config.crisp.id);
 
-      // (Optional) If onlyShowOnRoutes array is not empty in config.js file, Crisp will be hidden on the routes in the array.
-      // Use <AppButtonSupport> instead to show it (user clicks on the button to show Crisp—it cleans the UI)
-      if (
-        config.crisp.onlyShowOnRoutes &&
-        !config.crisp.onlyShowOnRoutes?.includes(pathname)
-      ) {
-        Crisp.chat.hide();
-        Crisp.chat.onChatClosed(() => {
-          Crisp.chat.hide();
-        });
-      }
-    }
-  }, [pathname]);
+  //     // (Optional) If onlyShowOnRoutes array is not empty in config.js file, Crisp will be hidden on the routes in the array.
+  //     // Use <AppButtonSupport> instead to show it (user clicks on the button to show Crisp—it cleans the UI)
+  //     if (
+  //       config.crisp.onlyShowOnRoutes &&
+  //       !config.crisp.onlyShowOnRoutes?.includes(pathname)
+  //     ) {
+  //       Crisp.chat.hide();
+  //       Crisp.chat.onChatClosed(() => {
+  //         Crisp.chat.hide();
+  //       });
+  //     }
+  //   }
+  // }, [pathname]);
 
   // Add User Unique ID to Crisp to easily identify users when reaching support (optional)
-  useEffect(() => {
-    if (data?.user && config?.crisp?.id) {
-      Crisp.session.setData({ userId: data.user?.id });
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data?.user && config?.crisp?.id) {
+  //     Crisp.session.setData({ userId: data.user?.id });
+  //   }
+  // }, [data]);
 
-  return null;
-};
+//   return null;
+// };
 
 // All the client wrappers are here (they can't be in server components)
 // 1. NextTopLoader: Show a progress bar at the top when navigating between pages
@@ -89,7 +89,7 @@ const ClientLayout = ({ children }: { children: ReactNode }) => {
       />
 
       {/* Set Crisp customer chat support */}
-      <CrispChat />
+      {/* <CrispChat /> */}
     </>
   );
 };
