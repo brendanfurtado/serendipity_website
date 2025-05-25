@@ -51,10 +51,10 @@ const config = {
     // In production, you would use your own verified domain
     fromNoReply: isDev
       ? `Serendipity <onboarding@resend.dev>`
-      : `Serendipity <noreply@serendipitydating.com>`,
+      : `Serendipity <noreply@serendipitydating.io>`,
     fromAdmin: isDev
       ? `Team Serendipity <onboarding@resend.dev>`
-      : `Team Serendipity <hello@serendipitydating.com>`,
+      : `Team Serendipity <hello@serendipitydating.io>`,
     // Email shown to customer if need support.
     supportEmail: isDev
       ? "onboarding@resend.dev"

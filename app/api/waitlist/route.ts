@@ -5,11 +5,20 @@ import config from "@/config";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, gender } = await req.json();
+    const { email, gender, age } = await req.json();
     const headers = req.headers;
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // Strict age validation for 18+
+    const parsedAge = parseInt(String(age), 10);
+    if (isNaN(parsedAge) || parsedAge < 18 || parsedAge > 120) {
+      return NextResponse.json(
+        { error: "You must be at least 18 years old to use this service" },
+        { status: 400 }
+      );
     }
 
     // Get source information
@@ -32,6 +41,7 @@ export async function POST(req: NextRequest) {
       {
         p_email: email,
         p_gender: gender,
+        p_age: parsedAge,
         p_source: source,
         p_utm_source: utmSource,
         p_utm_campaign: utmCampaign,
@@ -68,51 +78,70 @@ export async function POST(req: NextRequest) {
     const totalSignups =
       signupData?.total_signups || (await getSignupCount(supabase));
 
+    // Track email sending errors but don't fail the whole signup process
+    let confirmationEmailError = null;
+    let adminEmailError = null;
+
     // Send confirmation email to the user
-    await sendEmail({
-      to: email,
-      subject: `Welcome to the ${config.appName} Waitlist!`,
-      text: `Thank you for joining our waitlist! We'll keep you updated on our progress and let you know when we're ready to welcome you to our community.`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #e11d48; margin-bottom: 20px;">Welcome to the ${config.appName} Waitlist!</h1>
-          <p>Thank you for joining our waitlist! We're excited to have you as part of our growing community.</p>
-          <p>We're building a dating platform focused on balance and authenticity, and we can't wait to share it with you.</p>
-          <p>You're number <strong>${totalSignups}</strong> to join our waitlist!</p>
-          <p>We'll keep you updated on our progress and let you know when we're ready to welcome you.</p>
-          <div style="margin: 30px 0; padding: 20px; background: linear-gradient(to right, #f9a8d4, #c4b5fd); border-radius: 10px; text-align: center;">
-            <p style="margin: 0; color: #111827; font-weight: bold;">The ${config.appName} Team</p>
+    try {
+      await sendEmail({
+        to: email,
+        subject: `Welcome to the ${config.appName} Waitlist!`,
+        text: `Thank you for joining our waitlist! We'll keep you updated on our progress and let you know when we're ready to welcome you to our community.`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #e11d48; margin-bottom: 20px;">Welcome to the ${config.appName} Waitlist!</h1>
+            <p>Thank you for joining our waitlist! We're excited to have you as part of our growing community.</p>
+            <p>We're building a dating platform focused on balance and authenticity, and we can't wait to share it with you.</p>
+            <p>You're number <strong>${totalSignups}</strong> to join our waitlist!</p>
+            <p>We'll keep you updated on our progress and let you know when we're ready to welcome you.</p>
+            <div style="margin: 30px 0; padding: 20px; background: linear-gradient(to right, #f9a8d4, #c4b5fd); border-radius: 10px; text-align: center;">
+              <p style="margin: 0; color: #111827; font-weight: bold;">The ${config.appName} Team</p>
+            </div>
+            <p style="font-size: 12px; color: #6b7280;">If you didn't sign up for this waitlist, please ignore this email.</p>
           </div>
-          <p style="font-size: 12px; color: #6b7280;">If you didn't sign up for this waitlist, please ignore this email.</p>
-        </div>
-      `,
-    });
+        `,
+      });
+    } catch (error) {
+      console.error("Error sending confirmation email:", error);
+      confirmationEmailError = error;
+      // Continue with the process even if email fails
+    }
 
     // Also send a notification to the admin
-    await sendEmail({
-      to:
-        config.resend.supportEmail ||
-        config.resend.fromAdmin.split("<")[1].replace(">", ""),
-      subject: "New Waitlist Signup",
-      text: `New waitlist signup: ${email} (${gender}). Total waitlist: ${totalSignups}`,
-      html: `
-        <div style="font-family: sans-serif;">
-          <h2>New Waitlist Signup</h2>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Gender:</strong> ${gender || "Not specified"}</p>
-          <p><strong>Total Signups:</strong> ${totalSignups}</p>
-          <p><strong>Source:</strong> ${source}</p>
-          <p><strong>Country:</strong> ${country || "Unknown"}</p>
-        </div>
-      `,
-      replyTo: email,
-    });
+    try {
+      await sendEmail({
+        to:
+          config.resend.supportEmail ||
+          config.resend.fromAdmin.split("<")[1].replace(">", ""),
+        subject: "New Waitlist Signup",
+        text: `New waitlist signup: ${email} (${gender}, Age: ${parsedAge}). Total waitlist: ${totalSignups}`,
+        html: `
+          <div style="font-family: sans-serif;">
+            <h2>New Waitlist Signup</h2>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Gender:</strong> ${gender || "Not specified"}</p>
+            <p><strong>Age:</strong> ${parsedAge}</p>
+            <p><strong>Total Signups:</strong> ${totalSignups}</p>
+            <p><strong>Source:</strong> ${source}</p>
+            <p><strong>Country:</strong> ${country || "Unknown"}</p>
+          </div>
+        `,
+        replyTo: email,
+      });
+    } catch (error) {
+      console.error("Error sending admin notification email:", error);
+      adminEmailError = error;
+      // Continue with the process even if email fails
+    }
 
     return NextResponse.json(
       {
         success: true,
         message: "Successfully joined the waitlist",
         totalSignups,
+        confirmationEmailError: confirmationEmailError ? true : undefined,
+        adminEmailError: adminEmailError ? true : undefined,
       },
       { status: 200 }
     );

@@ -87,7 +87,7 @@ We do not share your personal data with any third parties except as required for
 
 4. Children's Privacy
 
-ShipFast is not intended for children under the age of 13. We do not knowingly collect personal information from children. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us at the email address provided below.
+${config.appName} is not intended for individuals under the age of 18. We do not knowingly collect personal information from children under 18. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us at the email address provided below. If we learn that we have collected personal information from a child under 18, we will take steps to delete such information promptly.
 
 5. Updates to the Privacy Policy
 

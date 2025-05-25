@@ -6,15 +6,50 @@ import config from "@/config";
 import { LiveCounter } from "./LiveCounter";
 import { useRouter } from "next/navigation";
 
+// components/landing/SignUpForm.tsx
+
 export function SignUpForm() {
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("");
+  const [age, setAge] = useState(""); // For age input
+  const [ageError, setAgeError] = useState(""); // For age validation error message
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // Validate age when the field changes
+  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAge(value);
+
+    // Clear error when field is emptied
+    if (!value) {
+      setAgeError("");
+      return;
+    }
+
+    const parsedAge = parseInt(value, 10);
+    if (isNaN(parsedAge)) {
+      setAgeError("Please enter a valid number");
+    } else if (parsedAge < 18) {
+      setAgeError("You must be at least 18 years old to use this service");
+    } else if (parsedAge > 120) {
+      setAgeError("Please enter a valid age");
+    } else {
+      setAgeError("");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate age before submission
+    const parsedAge = parseInt(age, 10);
+    if (isNaN(parsedAge) || parsedAge < 18 || parsedAge > 120) {
+      setAgeError("You must be at least 18 years old to use this service");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -23,9 +58,14 @@ export function SignUpForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, gender }),
+        body: JSON.stringify({
+          email,
+          gender,
+          age: parsedAge, // Send validated age
+        }),
       });
 
+      // Rest of the function remains the same
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to join waitlist");
@@ -60,8 +100,9 @@ export function SignUpForm() {
       id="join-waitlist"
       className="w-full py-12 md:py-24 bg-gradient-to-b from-white to-rose-50"
     >
-      {/* Added mx-auto and max-w-screen-xl for consistent container sizing */}
+      {/* Existing container code */}
       <div className="container px-4 md:px-6 mx-auto max-w-screen-xl">
+        {/* Existing heading code */}
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="inline-block rounded-lg bg-rose-100 px-3 py-1 text-sm text-rose-700">
             Join the Movement
@@ -74,6 +115,7 @@ export function SignUpForm() {
               "Join our waitlist to be among the first to experience the new era of balance and authentic dating."}
           </p>
         </div>
+
         <div className="mx-auto mt-12 max-w-md">
           {!submitted ? (
             <form
@@ -98,6 +140,35 @@ export function SignUpForm() {
                     placeholder="you@example.com"
                   />
                 </div>
+
+                {/* Age field with validation */}
+                <div>
+                  <label
+                    htmlFor="age"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Age <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    id="age"
+                    type="number"
+                    required
+                    min="18"
+                    max="120"
+                    value={age}
+                    onChange={handleAgeChange}
+                    className={`w-full rounded-md border ${
+                      ageError ? "border-rose-500" : "border-gray-200"
+                    } px-4 py-2 text-sm focus:outline-none focus:ring-1 ${
+                      ageError ? "focus:ring-rose-500" : "focus:ring-rose-500"
+                    }`}
+                    placeholder="Must be 18 or older"
+                  />
+                  {ageError && (
+                    <p className="mt-1 text-sm text-rose-500">{ageError}</p>
+                  )}
+                </div>
+
                 <div>
                   <label
                     htmlFor="gender"
@@ -123,11 +194,12 @@ export function SignUpForm() {
                     <option value="prefer-not-to-say">Prefer not to say</option>
                   </select>
                 </div>
+
                 <div className="pt-2">
                   <button
                     type="submit"
                     className="w-full inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-rose-500 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-gradient-to-r hover:from-rose-600 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
-                    disabled={isLoading}
+                    disabled={isLoading || !!ageError}
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
@@ -161,10 +233,12 @@ export function SignUpForm() {
                     )}
                   </button>
                 </div>
+
                 <p className="text-xs text-gray-500 text-center pt-2">
                   By joining, you agree to our Terms of Service and Privacy
-                  Policy. We&apos;ll notify you when we&apos;re ready to welcome
-                  you to our balanced community.
+                  Policy. You must be 18 or older to use this service.
+                  We&apos;ll notify you when we&apos;re ready to welcome you to
+                  our balanced community.
                 </p>
               </div>
             </form>
@@ -194,6 +268,7 @@ export function SignUpForm() {
               </p>
             </div>
           )}
+          {/* Existing counter section */}
           <div className="mt-8 flex items-center justify-center space-x-2">
             <div className="flex -space-x-2">
               <div className="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-rose-200"></div>

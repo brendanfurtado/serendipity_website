@@ -71,25 +71,29 @@ ShipFast is a platform that offers a JavaScript code boilerplate to assist entre
 
 When you purchase a package from ShipFast, you gain the right to download and use the code provided for creating applications. You own the code you create but do not have the right to resell it. We offer a full refund within 7 days of purchase, as specified in our refund policy.
 
-3. User Data and Privacy
+3. Eligibility
+
+To use ${config.appName}, you must be at least 18 years old. By using our service, you represent and warrant that you are at least 18 years of age. We reserve the right to request proof of age at any time, and to terminate or suspend accounts where we have reason to believe the user is under 18 years of age.
+
+4. User Data and Privacy
 
 We collect and store user data, including name, email, and payment information, as necessary to provide our services. For details on how we handle your data, please refer to our Privacy Policy at https://shipfa.st/privacy-policy.
 
-4. Non-Personal Data Collection
+5. Non-Personal Data Collection
 
 We use web cookies to collect non-personal data for the purpose of improving our services and user experience.
 
-5. Governing Law
+6. Governing Law
 
 These Terms are governed by the laws of France.
 
-6. Updates to the Terms
+7. Updates to the Terms
 
 We may update these Terms from time to time. Users will be notified of any changes via email.
 
 For any questions or concerns regarding these Terms of Service, please contact us at marc@shipfa.st.
 
-Thank you for using ShipFast!`}
+Thank you for using Serendipity Dating!`}
         </pre>
       </div>
     </main>

@@ -29,24 +29,54 @@ export const sendEmail = async ({
   html: string;
   replyTo?: string | string[];
 }): Promise<any> => {
-  // If skipEmails is true or we're in development mode and Resend is not available, just log the email
-  if (skipEmails || (process.env.NODE_ENV === "development" && !resend)) {
+  // If skipEmails is true, just log the email
+  if (skipEmails) {
     console.log("Email would have been sent:");
     console.log({ to, subject, from: config.resend.fromAdmin, text, replyTo });
     return { id: "dev-mode-no-email-sent" };
   }
 
-  // If Resend is not available in production, throw an error
-  if (!resend && process.env.NODE_ENV === "production") {
+  // If Resend is not available, throw an error
+  if (!resend) {
     throw new Error("Resend API key is not configured. Cannot send emails.");
   }
 
+  // Handle development environment properly - use onboarding@resend.dev as sender
+  // or send only to the developer's email if in development
+  const isDev = process.env.NODE_ENV === "development";
+
   try {
+    let fromAddress = isDev
+      ? "Serendipity <onboarding@resend.dev>" // Use Resend's test address in dev
+      : config.resend.fromAdmin; // Use your domain in production
+
+    let emailTo = to;
+
+    // In development, if sending to external emails, redirect to your own email
+    if (isDev && process.env.DEVELOPER_EMAIL) {
+      // If 'to' is an array, replace it with developer email
+      if (Array.isArray(to)) {
+        console.log(
+          `[DEV] Redirecting emails meant for ${to.join(", ")} to ${
+            process.env.DEVELOPER_EMAIL
+          }`
+        );
+        emailTo = process.env.DEVELOPER_EMAIL;
+      }
+      // If 'to' is not your own email, redirect to your email
+      else if (to !== process.env.DEVELOPER_EMAIL) {
+        console.log(
+          `[DEV] Redirecting email meant for ${to} to ${process.env.DEVELOPER_EMAIL}`
+        );
+        emailTo = process.env.DEVELOPER_EMAIL;
+      }
+    }
+
     // Send the email using Resend
-    const { data, error } = await resend!.emails.send({
-      from: config.resend.fromAdmin,
-      to,
-      subject,
+    const { data, error } = await resend.emails.send({
+      from: fromAddress,
+      to: emailTo,
+      subject: isDev ? `[TEST] ${subject}` : subject, // Prefix subject in dev mode
       text,
       html,
       ...(replyTo && { replyTo }),
@@ -67,13 +97,13 @@ export const sendEmail = async ({
       console.error("Email domain verification error:", error.message);
 
       // In development, we'll try to recover by using the Resend test domain
-      if (process.env.NODE_ENV === "development") {
+      if (isDev) {
         // Try again with the onboarding@resend.dev address
         try {
-          const { data, error: retryError } = await resend!.emails.send({
+          const { data, error: retryError } = await resend.emails.send({
             from: "Serendipity <onboarding@resend.dev>",
-            to,
-            subject,
+            to: process.env.DEVELOPER_EMAIL || to, // Send to developer in dev mode
+            subject: `[TEST] ${subject}`,
             text,
             html,
             ...(replyTo && { replyTo }),
