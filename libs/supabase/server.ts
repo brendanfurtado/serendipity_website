@@ -2,7 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function createClient() {
-  const cookieStore = cookies();
+  // Await the cookies() call before accessing its methods
+  const cookieStore = await cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,8 +11,8 @@ export async function createClient() {
     {
       cookies: {
         async getAll() {
-          const cookiesList = await Promise.resolve(cookieStore.getAll());
-          return cookiesList;
+          // Now cookieStore is properly awaited, so we can use getAll() directly
+          return cookieStore.getAll();
         },
         async setAll(cookiesToSet) {
           try {
