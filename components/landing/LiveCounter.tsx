@@ -25,7 +25,6 @@ export function LiveCounter({
     const fetchCount = async () => {
       try {
         setIsLoading(true);
-        console.log("Fetching waitlist count...");
         const response = await fetch("/api/waitlist/count");
 
         if (!response.ok) {
@@ -40,7 +39,6 @@ export function LiveCounter({
         }
 
         const data = await response.json();
-        console.log("Waitlist count received:", data);
 
         if (data && typeof data.count === "number") {
           setCount(data.count);

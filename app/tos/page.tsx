@@ -2,15 +2,6 @@ import Link from "next/link";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 
-// CHATGPT PROMPT TO GENERATE YOUR TERMS & SERVICES — replace with your own data 👇
-
-// 1. Go to https://chat.openai.com/
-// 2. Copy paste bellow
-// 3. Replace the data with your own (if needed)
-// 4. Paste the answer from ChatGPT directly in the <pre> tag below
-
-// You are an excellent lawyer.
-
 // I need your help to write a simple Terms & Services for my website. Here is some context:
 // - Website: https://serendipitydating.io
 // - Name: Serendipity Dating
@@ -31,7 +22,7 @@ export const metadata = getSEOTags({
 
 const TOS = () => {
   return (
-    <main className="max-w-xl mx-auto">
+    <main className="max-w-2xl mx-auto">
       <div className="p-5">
         <Link href="/" className="btn btn-ghost">
           <svg
@@ -52,48 +43,177 @@ const TOS = () => {
           Terms and Conditions for {config.appName}
         </h1>
 
-        <pre
-          className="leading-relaxed whitespace-pre-wrap"
+        <div
+          className="prose prose-slate max-w-none leading-relaxed"
           style={{ fontFamily: "sans-serif" }}
         >
-          {`Last Updated: September 26, 2023
+          <p className="text-sm text-gray-500">Last Updated: May 26, 2025</p>
 
-Welcome to ShipFast!
+          <h2>Welcome to Serendipity Dating</h2>
 
-These Terms of Service ("Terms") govern your use of the ShipFast website at https://shipfa.st ("Website") and the services provided by ShipFast. By using our Website and services, you agree to these Terms.
+          <p>
+            These Terms of Service ("Terms") govern your use of the Serendipity
+            Dating website at https://serendipitydating.io ("Website") and all
+            related services provided by Serendipity Dating. By accessing or
+            using our Website and services, you agree to be bound by these
+            Terms. If you do not agree with any part of these Terms, you should
+            not use our services.
+          </p>
 
-1. Description of ShipFast
+          <h2>1. Description of Serendipity Dating</h2>
 
-ShipFast is a platform that offers a JavaScript code boilerplate to assist entrepreneurs in launching their startups more efficiently.
+          <p>
+            Serendipity Dating is a platform designed to create balanced
+            communities and foster authentic connections between users. We aim
+            to provide an equitable environment for users to meet and connect
+            with others who share similar interests and values.
+          </p>
 
-2. Ownership and Usage Rights
+          <h2>2. Eligibility</h2>
 
-When you purchase a package from ShipFast, you gain the right to download and use the code provided for creating applications. You own the code you create but do not have the right to resell it. We offer a full refund within 7 days of purchase, as specified in our refund policy.
+          <p>
+            To use Serendipity Dating, you must be at least 18 years old. By
+            creating an account or using our services, you represent and warrant
+            that you are at least 18 years of age. We reserve the right to
+            request proof of age at any time and to terminate or suspend
+            accounts where we have reason to believe the user is under 18 years
+            of age.
+          </p>
 
-3. Eligibility
+          <h2>3. Account Creation and Security</h2>
 
-To use ${config.appName}, you must be at least 18 years old. By using our service, you represent and warrant that you are at least 18 years of age. We reserve the right to request proof of age at any time, and to terminate or suspend accounts where we have reason to believe the user is under 18 years of age.
+          <p>
+            When you create an account with Serendipity Dating, you agree to
+            provide accurate, current, and complete information. You are
+            responsible for maintaining the confidentiality of your account
+            credentials and for all activities that occur under your account.
+            You agree to immediately notify us of any unauthorized use of your
+            account or any other breach of security.
+          </p>
 
-4. User Data and Privacy
+          <h2>4. User Conduct</h2>
 
-We collect and store user data, including name, email, and payment information, as necessary to provide our services. For details on how we handle your data, please refer to our Privacy Policy at https://shipfa.st/privacy-policy.
+          <p>You agree not to use Serendipity Dating to:</p>
+          <ul>
+            <li>Violate any applicable laws or regulations</li>
+            <li>Impersonate any person or entity</li>
+            <li>Harass, abuse, or harm another person</li>
+            <li>Post or share inappropriate, offensive, or explicit content</li>
+            <li>Attempt to circumvent any security features of the platform</li>
+            <li>Use the service for commercial purposes without our consent</li>
+            <li>
+              Engage in any activity that could damage, disable, or impair the
+              functioning of the service
+            </li>
+          </ul>
 
-5. Non-Personal Data Collection
+          <h2>5. User Content</h2>
 
-We use web cookies to collect non-personal data for the purpose of improving our services and user experience.
+          <p>
+            You retain ownership of any content you submit to Serendipity
+            Dating. By posting content on our platform, you grant us a
+            non-exclusive, worldwide, royalty-free license to use, reproduce,
+            modify, and display your content for the purpose of operating and
+            improving our services.
+          </p>
 
-6. Governing Law
+          <h2>6. Privacy</h2>
 
-These Terms are governed by the laws of France.
+          <p>
+            Our Privacy Policy, available at{" "}
+            <a
+              href="https://serendipitydating.io/privacy-policy"
+              className="text-rose-600 hover:text-rose-800"
+            >
+              https://serendipitydating.io/privacy-policy
+            </a>
+            , describes how we collect, use, and share your personal
+            information. By using Serendipity Dating, you consent to our
+            collection and use of personal data as outlined in the Privacy
+            Policy.
+          </p>
 
-7. Updates to the Terms
+          <h2>7. User Data</h2>
 
-We may update these Terms from time to time. Users will be notified of any changes via email.
+          <p>
+            We collect and store user data, including email, age, gender, and
+            other information you choose to provide. This information is used to
+            create and maintain your account, provide our services, and improve
+            your experience. We also collect non-personal data through web
+            cookies to enhance our website functionality and user experience.
+          </p>
 
-For any questions or concerns regarding these Terms of Service, please contact us at marc@shipfa.st.
+          <h2>8. Termination</h2>
 
-Thank you for using Serendipity Dating!`}
-        </pre>
+          <p>
+            We reserve the right to suspend or terminate your account at any
+            time for any reason, including but not limited to, violation of
+            these Terms. Upon termination, your right to use Serendipity Dating
+            will immediately cease.
+          </p>
+
+          <h2>9. Disclaimers</h2>
+
+          <p>
+            Serendipity Dating is provided "as is" and "as available" without
+            warranties of any kind, either express or implied. We do not
+            guarantee that our services will be uninterrupted, secure, or
+            error-free. We are not responsible for the conduct of any users on
+            our platform.
+          </p>
+
+          <h2>10. Limitation of Liability</h2>
+
+          <p>
+            To the maximum extent permitted by law, Serendipity Dating shall not
+            be liable for any indirect, incidental, special, consequential, or
+            punitive damages resulting from your use or inability to use our
+            services.
+          </p>
+
+          <h2>11. Indemnification</h2>
+
+          <p>
+            You agree to indemnify and hold Serendipity Dating harmless from any
+            claims, damages, liabilities, and expenses arising out of your use
+            of our services, your violation of these Terms, or your violation of
+            any rights of another.
+          </p>
+
+          <h2>12. Governing Law</h2>
+
+          <p>
+            These Terms are governed by the laws of the United States without
+            regard to its conflict of law provisions.
+          </p>
+
+          <h2>13. Changes to Terms</h2>
+
+          <p>
+            We may update these Terms from time to time. We will notify you of
+            any changes by posting the new Terms on this page and sending you an
+            email notification. Your continued use of Serendipity Dating after
+            such changes constitutes your acceptance of the new Terms.
+          </p>
+
+          <h2>14. Contact Information</h2>
+
+          <p>
+            For questions or concerns regarding these Terms, please contact us
+            at{" "}
+            <a
+              href="mailto:dev@serendipitydating.io"
+              className="text-rose-600 hover:text-rose-800"
+            >
+              dev@serendipitydating.io
+            </a>
+            .
+          </p>
+
+          <p className="mt-8 text-center">
+            Thank you for using Serendipity Dating!
+          </p>
+        </div>
       </div>
     </main>
   );
