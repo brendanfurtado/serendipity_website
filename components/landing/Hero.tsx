@@ -1,4 +1,5 @@
-// components/landing/Hero.tsx
+// components/landing/Hero.tsx - Updated version with centered content
+
 "use client";
 
 import React from "react";
@@ -13,9 +14,10 @@ export function Hero() {
       {/* Changed from 'container px-4 md:px-6' to add mx-auto and max-w settings */}
       <div className="container px-4 md:px-6 mx-auto max-w-screen-xl">
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
-          <div className="flex flex-col justify-center space-y-4">
+          {/* Modified this div to center the content */}
+          <div className="flex flex-col justify-center items-center text-center space-y-4">
             <div className="inline-block rounded-lg bg-rose-100 px-3 py-1 text-sm text-rose-700">
-              Bringing back the REAL way to meet your match.
+              Bringing back the Spontaneity and Serendipity in Our Lives
             </div>
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl">
               Dating with <span className="text-rose-500">Balance</span> and{" "}
@@ -40,7 +42,7 @@ export function Hero() {
                 Learn More
               </Link>
             </div>
-            <div className="flex items-center gap-4 pt-4">
+            <div className="flex items-center justify-center gap-4 pt-4">
               <div className="flex -space-x-2">
                 <div className="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-rose-200"></div>
                 <div className="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-violet-200"></div>

@@ -6,6 +6,7 @@ import { Menu } from "lucide-react";
 import config from "@/config";
 import { usePathname, useRouter } from "next/navigation";
 import { scrollToSection, scrollToHashOnLoad } from "@/utils/scrollUtils";
+import Image from "next/image";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -63,6 +64,12 @@ export function Navbar() {
       {/* Added mx-auto and max-w-screen-xl for consistent container sizing */}
       <div className="container flex h-16 items-center justify-between px-4 md:px-6 mx-auto max-w-screen-xl">
         <div className="flex items-center">
+          {/* <Image
+            src="/apple-icon.png"
+            alt="Serendipity Logo"
+            width={32}
+            height={32}
+          /> */}
           <Link href="/" className="text-2xl font-bold tracking-tighter">
             <span className="text-rose-500">Seren</span>
             <span className="text-violet-600">dipity</span>
