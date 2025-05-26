@@ -2,16 +2,28 @@
 
 import Link from "next/link";
 import ButtonSupport from "@/components/ButtonSupport";
+import { useEffect } from "react";
 
 // A simple error boundary to show a nice error page if something goes wrong (Error Boundary)
-// Users can contanct support, go to the main page or try to reset/refresh to fix the error
+// Users can contact support, go to the main page or try to reset/refresh to fix the error
 export default function Error({
   error,
   reset,
 }: {
-  error: Error;
+  error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    // Log the error to an error reporting service
+    console.error("Error encountered:", error);
+  }, [error]);
+
+  // Determine if this is a blog-related error
+  const isBlogError =
+    error.message?.includes("categories") ||
+    error.message?.includes("article") ||
+    window.location.pathname.includes("/blog");
+
   return (
     <>
       <div className="h-screen w-full flex flex-col justify-center items-center text-center gap-6 p-6">
@@ -119,19 +131,13 @@ export default function Error({
               fill="#b3b3b3"
               d="m131.05 438.563.21-1.989 41.733 4.42-.211 1.989zM126.801 454.875l.82-1.824 33.583 15.11-.82 1.824zM177.384 426.985l-39.583-13.11.821-1.824 39.583 13.11-.821 1.824zM181.384 417.985l-39.583-19.11.821-1.824 39.583 19.11-.821 1.824zM122.832 470.232l1.299-1.521 28.54 24.38-1.3 1.52zM114.207 477.62l1.821-.827 11.46 25.27-1.822.825z"
             />
-            <path
-              fill="#f2f2f2"
-              d="M384.34 477.987V22.183c0-6.155.117-12.323 0-18.477-.005-.27 0-.539 0-.808 0-3.86-6-3.867-6 0v455.804c0 6.155-.117 12.323 0 18.477.005.27 0 .539 0 .808 0 3.86 6 3.867 6 0Z"
-            />
-            <path
-              fill="#f2f2f2"
-              d="M417.523 130.291h-72a6.508 6.508 0 0 1-6.5-6.5v-87.5a6.508 6.508 0 0 1 6.5-6.5h72a6.508 6.508 0 0 1 6.5 6.5v87.5a6.508 6.508 0 0 1-6.5 6.5Z"
-            />
           </svg>
         </div>
 
         <p className="font-medium md:text-xl md:font-semibold">
-          Something went wrong 🥲
+          {isBlogError
+            ? "We couldn't find the blog article you're looking for"
+            : "Something went wrong 🥲"}
         </p>
 
         <p className="text-red-500">{error?.message}</p>
@@ -153,21 +159,39 @@ export default function Error({
             Refresh
           </button>
           <ButtonSupport />
-          <Link href="/" className="btn btn-sm">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                fillRule="evenodd"
-                d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11h-1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-3a1 1 0 00-1-1H9a1 1 0 00-1 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-6H3a1 1 0 01-.707-1.707l7-7z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Home
-          </Link>
+          {isBlogError ? (
+            <Link href="/blog" className="btn btn-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11h-1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-3a1 1 0 00-1-1H9a1 1 0 00-1 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-6H3a1 1 0 01-.707-1.707l7-7z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Blog Home
+            </Link>
+          ) : (
+            <Link href="/" className="btn btn-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11h-1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-3a1 1 0 00-1-1H9a1 1 0 00-1 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-6H3a1 1 0 01-.707-1.707l7-7z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Home
+            </Link>
+          )}
         </div>
       </div>
     </>

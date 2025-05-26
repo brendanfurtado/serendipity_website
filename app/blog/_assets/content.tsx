@@ -1,8 +1,12 @@
 import type { JSX } from "react";
 import Image, { StaticImageData } from "next/image";
-import marcImg from "@/app/blog/_assets/images/authors/marc.png";
+import serendipityImg from "@/app/blog/_assets/images/authors/serendipity.png";
 import introducingSupabaseImg from "@/public/blog/introducing-supabase/header.png";
 
+// Import new blog post images
+import connectionsImg from "@/public/blog/connections.jpg";
+import communityImg from "@/public/blog/community.jpg";
+import meetingsImg from "@/public/blog/meetings.jpg";
 // ==================================================================================================================================================================
 // BLOG CATEGORIES 🏷️
 // ==================================================================================================================================================================
@@ -19,6 +23,7 @@ export type categoryType = {
 const categorySlugs: { [key: string]: string } = {
   feature: "feature",
   tutorial: "tutorial",
+  dating: "dating-insights",
 };
 
 // All the blog categories data display in the /blog/category/[categoryI].js pages.
@@ -34,7 +39,7 @@ export const categories: categoryType[] = [
     description:
       "Here are the latest features we've added to ShipFast. I'm constantly improving our product to help you ship faster.",
     // A short version of the description above, only displayed in the <Header /> on mobile. Up to 60 characters.
-    descriptionShort: "Latest features added to ShipFast.",
+    descriptionShort: "Latest features added to Serendity Dating.",
   },
   {
     slug: categorySlugs.tutorial,
@@ -44,6 +49,14 @@ export const categories: categoryType[] = [
       "Learn how to use ShipFast with these step-by-step tutorials. I'll show you how to ship faster and save time.",
     descriptionShort:
       "Learn how to use ShipFast with these step-by-step tutorials.",
+  },
+  {
+    slug: categorySlugs.dating,
+    title: "Dating Insights",
+    titleShort: "Dating",
+    description:
+      "Exploring authentic connections, dating insights, and community stories for better relationships.",
+    descriptionShort: "Authentic dating insights and community stories.",
   },
 ];
 
@@ -124,7 +137,8 @@ const socialIcons: {
 const authorSlugs: {
   [key: string]: string;
 } = {
-  marc: "marc",
+  marc: "Serendipity",
+  team: "serendipity-team", // Added new author for the team
 };
 
 // All the blog authors data display in the /blog/author/[authorId].js pages.
@@ -133,14 +147,14 @@ export const authors: authorType[] = [
     // The slug to use in the URL, from the authorSlugs object above.
     slug: authorSlugs.marc,
     // The name to display in the author's bio. Up to 60 characters.
-    name: "Marc Lou",
+    name: "Serendipity",
     // The job to display in the author's bio. Up to 60 characters.
     job: "Maker of ByeDispute",
     // The description of the author to display in the author's bio. Up to 160 characters.
     description:
       "Marc is a developer and an entrepreneur. He's built 20 startups in the last 3 years. 6 were profitable and 3 were acquired. He's currently building ByeDispute, the #1 Stripe Chargebacks Protection tool.",
     // The avatar of the author to display in the author's bio and avatar badge. It's better to use a local image, but you can also use an external image (https://...)
-    avatar: marcImg,
+    avatar: serendipityImg,
     // A list of social links to display in the author's bio.
     socials: [
       {
@@ -157,6 +171,21 @@ export const authors: authorType[] = [
         name: socialIcons.github.name,
         icon: socialIcons.github.svg,
         url: "https://github.com/Marc-Lou-Org/ship-fast",
+      },
+    ],
+  },
+  {
+    slug: authorSlugs.team,
+    name: "Serendipity Team",
+    job: "Dating Experts",
+    description:
+      "The Serendipity team is dedicated to creating authentic connections and reimagining online dating with a focus on balanced communities and meaningful relationships.",
+    avatar: "/images/authors/founder.jpg", // Make sure this path exists
+    socials: [
+      {
+        name: socialIcons.twitter.name,
+        icon: socialIcons.twitter.svg,
+        url: "https://twitter.com/serendipity_dev",
       },
     ],
   },
@@ -198,91 +227,245 @@ const styles: {
 
 // All the blog articles data display in the /blog/[articleId].js pages.
 export const articles: articleType[] = [
+  // New blog post shown in the UI
   {
-    // The unique slug to use in the URL. It's also used to generate the canonical URL.
-    slug: "introducing-supabase",
-    // The title to display in the article page (h1). Less than 60 characters. It's also used to generate the meta title.
-    title: "Introducing Supabase to ShipFast",
-    // The description of the article to display in the article page. Up to 160 characters. It's also used to generate the meta description.
+    slug: "building-better-connections",
+    title: "Building Better Connections in the Digital Age",
     description:
-      "Supabase is an open-source Firebase alternative. It's a great tool for building a backend for your app. It's now integrated with ShipFast!",
-    // An array of categories of the article. It's used to generate the category badges, the category filter, and more.
+      "How we're reimagining online dating to create more meaningful relationships in the digital age.",
     categories: [
-      categories.find((category) => category.slug === categorySlugs.feature),
+      categories.find((category) => category.slug === categorySlugs.dating),
     ],
-    // The author of the article. It's used to generate a link to the author's bio page.
-    author: authors.find((author) => author.slug === authorSlugs.marc),
-    // The date of the article. It's used to generate the meta date.
-    publishedAt: "2023-11-20",
+    author: authors.find((author) => author.slug === authorSlugs.team),
+    publishedAt: "2024-03-15",
     image: {
-      // The image to display in <CardArticle /> components.
-      src: introducingSupabaseImg,
-      // The relative URL of the same image to use in the Open Graph meta tags & the Schema Markup JSON-LD. It should be the same image as the src above.
-      urlRelative: "/blog/introducing-supabase/header.jpg",
-      alt: "Supabase and ShipFast logo combined",
+      src: connectionsImg,
+      urlRelative: "/images/blog/connections.jpg",
+      alt: "People connecting authentically",
     },
-    // The actual content of the article that will be shown under the <h1> title in the article page.
     content: (
       <>
         <Image
-          src={introducingSupabaseImg}
-          alt="Supabase and ShipFast logo combined"
+          src={connectionsImg}
+          alt="People connecting authentically"
           width={700}
-          height={500}
+          height={400}
           priority={true}
           className="rounded-box"
-          placeholder="blur"
         />
         <section>
-          <h2 className={styles.h2}>Introduction</h2>
+          <h2 className={styles.h2}>The Problem with Modern Dating Apps</h2>
           <p className={styles.p}>
-            Supabase is an open-source Firebase alternative. It&apos;s a great
-            tool for building a backend for your app. It&apos;s now integrated
-            with ShipFast!
+            The rise of dating apps has transformed how we meet potential
+            partners, but it&apos;s also created new challenges. Endless
+            swiping, superficial connections, and algorithm-driven matches have
+            left many feeling disconnected and frustrated.
+          </p>
+          <p className={styles.p}>
+            Dating app fatigue is real. Many users report feeling overwhelmed by
+            the paradox of choice, spending hours swiping through profiles only
+            to find themselves still searching for meaningful connections.
           </p>
         </section>
 
         <section>
-          <h3 className={styles.h3}>1. Create a supabase account</h3>
+          <h2 className={styles.h2}>Reimagining Connection</h2>
           <p className={styles.p}>
-            First, go to{" "}
-            <a href="https://supabase.com/" className="link link-primary">
-              Supabase
-            </a>{" "}
-            and create an account. It&apos;s free for up to 10,000 rows per
-            table.
-            <br />
-            Then create a new project and a new table. You can use the following
-            SQL schema:
+            At Serendipity, we believe that authentic connections flourish in
+            balanced, transparent environments. That&apos;s why we&apos;re
+            building a platform focused on meaningful interactions rather than
+            endless swiping.
           </p>
-
-          <pre className={styles.code}>
-            <code>
-              {`CREATE TABLE public.users (
-  id bigint NOT NULL DEFAULT nextval('users_id_seq'::regclass),
-  email text NOT NULL,
-  password text NOT NULL,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  CONSTRAINT users_pkey PRIMARY KEY (id)
-);`}
-            </code>
-          </pre>
+          <p className={styles.p}>
+            Our approach prioritizes quality over quantity, with features
+            designed to encourage deeper conversations and connections based on
+            shared values and interests. By creating a balanced community with
+            equal representation, we ensure everyone has a fair opportunity to
+            find meaningful relationships.
+          </p>
         </section>
 
         <section>
-          <h3 className={styles.h3}>2. Add your credentials to ShipFast</h3>
+          <h2 className={styles.h2}>The Power of In-Person Connection</h2>
           <p className={styles.p}>
-            Copy the <span className={styles.codeInline}>API URL</span> and{" "}
-            <span className={styles.codeInline}>API Key</span> from your
-            Supabase project settings and add them to your ShipFast project
-            settings. Add these files to your project:
+            While digital platforms provide convenience, we recognize that the
+            most meaningful connections often happen face-to-face. That&apos;s
+            why we&apos;re integrating real-life events and meetups into our
+            platform, creating opportunities for serendipitous encounters.
           </p>
+          <p className={styles.p}>
+            These curated gatherings provide a safe, welcoming environment for
+            community members to connect authentically, moving beyond the
+            limitations of digital interaction to forge genuine relationships.
+          </p>
+        </section>
+      </>
+    ),
+  },
+  // Second blog post shown in the UI
+  {
+    slug: "power-of-community-dating",
+    title: "The Power of Community-First Dating",
+    description:
+      "Why building strong communities leads to better matches and lasting connections.",
+    categories: [
+      categories.find((category) => category.slug === categorySlugs.dating),
+    ],
+    author: authors.find((author) => author.slug === authorSlugs.team),
+    publishedAt: "2024-03-10",
+    image: {
+      src: communityImg,
+      urlRelative: "/images/blog/community.jpg",
+      alt: "Community gathering",
+    },
+    content: (
+      <>
+        <Image
+          src={communityImg}
+          alt="Community gathering"
+          width={700}
+          height={400}
+          priority={true}
+          className="rounded-box"
+        />
+        <section>
+          <h2 className={styles.h2}>Community as the Foundation</h2>
+          <p className={styles.p}>
+            Traditional dating apps focus primarily on individual matching,
+            often ignoring the powerful role that communities play in fostering
+            meaningful relationships. At Serendipity, we're taking a different
+            approach.
+          </p>
+          <p className={styles.p}>
+            By building communities of like-minded individuals first, we create
+            an environment where authentic connections can naturally emerge.
+            When people share common values, interests, and goals, relationships
+            develop more organically and tend to be more fulfilling and lasting.
+          </p>
+        </section>
 
+        <section>
+          <h2 className={styles.h2}>The Benefits of Community-First Dating</h2>
+          <p className={styles.p}>
+            Community-first dating offers numerous advantages over traditional
+            swiping-based apps:
+          </p>
           <ul className={styles.ul}>
-            <li className={styles.li}>.env.local</li>
-            <li className={styles.li}>.env.production</li>
+            <li className={styles.li}>More contextual interactions</li>
+            <li className={styles.li}>
+              Natural ice-breakers through shared interests
+            </li>
+            <li className={styles.li}>
+              Reduced pressure on individual connections
+            </li>
+            <li className={styles.li}>Built-in social support network</li>
+            <li className={styles.li}>
+              Better compatibility through shared values
+            </li>
           </ul>
+        </section>
+
+        <section>
+          <h2 className={styles.h2}>Creating Balanced Communities</h2>
+          <p className={styles.p}>
+            One of the biggest challenges in dating apps is gender imbalance.
+            Many platforms suffer from highly skewed ratios, creating
+            frustrating experiences for everyone involved. Serendipity addresses
+            this by carefully curating communities with balanced representation.
+          </p>
+          <p className={styles.p}>
+            This approach ensures that everyone has equal opportunities to
+            connect, resulting in a more positive and equitable dating
+            experience. By prioritizing community health over growth at all
+            costs, we're building something fundamentally different from
+            existing dating platforms.
+          </p>
+        </section>
+      </>
+    ),
+  },
+  // Third blog post shown in the UI
+  {
+    slug: "online-to-in-person",
+    title: "From Online to In-Person",
+    description:
+      "Tips for transitioning your online connections to meaningful real-life relationships.",
+    categories: [
+      categories.find((category) => category.slug === categorySlugs.dating),
+    ],
+    author: authors.find((author) => author.slug === authorSlugs.team),
+    publishedAt: "2024-03-05",
+    image: {
+      src: meetingsImg,
+      urlRelative: "/images/blog/meetings.jpg",
+      alt: "People meeting in person",
+    },
+    content: (
+      <>
+        <Image
+          src={meetingsImg}
+          alt="People meeting in person"
+          width={700}
+          height={400}
+          priority={true}
+          className="rounded-box"
+        />
+        <section>
+          <h2 className={styles.h2}>The Digital-to-Physical Gap</h2>
+          <p className={styles.p}>
+            Online connections can be meaningful, but there's often a
+            significant gap between digital interaction and in-person chemistry.
+            Many people struggle with this transition, unsure of how to move
+            from messaging to meeting.
+          </p>
+          <p className={styles.p}>
+            This gap is one of the main reasons why promising online connections
+            sometimes fail to develop into meaningful relationships. At
+            Serendipity, we believe bridging this gap is essential for authentic
+            connection.
+          </p>
+        </section>
+
+        <section>
+          <h2 className={styles.h2}>Practical Tips for Meeting in Person</h2>
+          <p className={styles.p}>
+            Moving from online conversation to in-person meetings can be
+            nerve-wracking, but following these guidelines can help make the
+            transition smoother:
+          </p>
+          <ul className={styles.ul}>
+            <li className={styles.li}>
+              Suggest low-pressure, public meeting spots
+            </li>
+            <li className={styles.li}>
+              Plan activities that allow for natural conversation
+            </li>
+            <li className={styles.li}>
+              Set clear expectations about the nature of the meetup
+            </li>
+            <li className={styles.li}>
+              Prioritize safety with daytime meetings initially
+            </li>
+            <li className={styles.li}>
+              Be authentic rather than trying to impress
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 className={styles.h2}>The Role of Community Events</h2>
+          <p className={styles.p}>
+            One of Serendipity's core innovations is our focus on community
+            events as a natural bridge between online and in-person connection.
+            These curated gatherings provide a comfortable, low-pressure
+            environment to meet people you've connected with online.
+          </p>
+          <p className={styles.p}>
+            Meeting in a group setting first can reduce anxiety and allow for
+            more natural interaction. It also provides additional social context
+            that's often missing in one-on-one dates arranged through
+            traditional apps.
+          </p>
         </section>
       </>
     ),

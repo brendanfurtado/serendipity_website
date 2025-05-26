@@ -1,8 +1,10 @@
+// app/blog/page.tsx
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
+import { articles } from "./_assets/content";
 
 export const metadata = getSEOTags({
   title: `Blog | ${config.appName}`,
@@ -11,35 +13,13 @@ export const metadata = getSEOTags({
   canonicalUrlRelative: "/blog",
 });
 
-// Sample blog posts - In a real implementation, these would come from your CMS or API
-const blogPosts = [
-  {
-    slug: "building-better-connections",
-    title: "Building Better Connections in the Digital Age",
-    description:
-      "How we're reimagining online dating to create more meaningful relationships.",
-    date: "March 15, 2024",
-    image: "/images/blog/connections.jpg",
-  },
-  {
-    slug: "power-of-community-dating",
-    title: "The Power of Community-First Dating",
-    description:
-      "Why building strong communities leads to better matches and lasting connections.",
-    date: "March 10, 2024",
-    image: "/images/blog/community.jpg",
-  },
-  {
-    slug: "online-to-in-person",
-    title: "From Online to In-Person",
-    description:
-      "Tips for transitioning your online connections to meaningful real-life relationships.",
-    date: "March 5, 2024",
-    image: "/images/blog/meetings.jpg",
-  },
-];
+export default async function Blog() {
+  // Sort articles by date (newest first)
+  const sortedArticles = [...articles].sort(
+    (a, b) =>
+      new Date(b.publishedAt).valueOf() - new Date(a.publishedAt).valueOf()
+  );
 
-export default function Blog() {
   return (
     <section className="w-full py-12 md:py-24 bg-white">
       <div className="container px-4 md:px-6">
@@ -57,24 +37,32 @@ export default function Blog() {
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {blogPosts.map((post) => (
+          {sortedArticles.map((post) => (
             <div
               key={post.slug}
               className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
             >
               <div className="relative h-48 w-full">
-                <Image
-                  src={post.image}
-                  alt={post.title}
-                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                  width={400}
-                  height={240}
-                />
+                {post.image?.src && (
+                  <Image
+                    src={post.image.src}
+                    alt={post.image.alt}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    width={400}
+                    height={240}
+                  />
+                )}
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-3">
                   <Calendar className="h-4 w-4 text-violet-600" />
-                  <span className="text-sm text-gray-500">{post.date}</span>
+                  <span className="text-sm text-gray-500">
+                    {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </span>
                 </div>
                 <h2 className="text-xl font-bold mb-2">{post.title}</h2>
                 <p className="text-gray-600 mb-4">{post.description}</p>

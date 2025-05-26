@@ -1,3 +1,4 @@
+// app/blog/[articleId]/page.tsx
 import Link from "next/link";
 import Script from "next/script";
 import { articles } from "../_assets/content";
@@ -5,6 +6,7 @@ import BadgeCategory from "../_assets/components/BadgeCategory";
 import Avatar from "../_assets/components/Avatar";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
+import { notFound } from "next/navigation";
 
 export async function generateMetadata({
   params,
@@ -12,6 +14,15 @@ export async function generateMetadata({
   params: { articleId: string };
 }) {
   const article = articles.find((article) => article.slug === params.articleId);
+
+  // If article not found, return default metadata
+  if (!article) {
+    return getSEOTags({
+      title: "Article Not Found | Blog",
+      description: "The article you're looking for could not be found.",
+      canonicalUrlRelative: `/blog`,
+    });
+  }
 
   return getSEOTags({
     title: article.title,
@@ -42,6 +53,13 @@ export default async function Article({
   params: { articleId: string };
 }) {
   const article = articles.find((article) => article.slug === params.articleId);
+
+  // If article not found, show 404 page
+  if (!article) {
+    notFound();
+  }
+
+  // Find related articles (that share at least one category with the current article)
   const articlesRelated = articles
     .filter(
       (a) =>
