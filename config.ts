@@ -54,11 +54,9 @@ const config = {
       : `Serendipity <noreply@serendipitydating.io>`,
     fromAdmin: isDev
       ? `Team Serendipity <onboarding@resend.dev>`
-      : `Team Serendipity <hello@serendipitydating.io>`,
+      : `Team Serendipity <dev@serendipitydating.io>`,
     // Email shown to customer if need support.
-    supportEmail: isDev
-      ? "onboarding@resend.dev"
-      : "support@serendipitydating.io",
+    supportEmail: isDev ? "onboarding@resend.dev" : "dev@serendipitydating.io",
   },
   colors: {
     // Using light theme as base with rose/violet gradient accents
