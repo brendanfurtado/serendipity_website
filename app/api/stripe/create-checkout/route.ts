@@ -1,3 +1,4 @@
+// app/api/stripe/create-checkout/route.ts
 import { createCheckout } from "@/libs/stripe";
 import { createClient } from "@/libs/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -29,7 +30,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const supabase = createClient();
+    // Await the createClient function since it returns a Promise
+    const supabase = await createClient();
 
     const {
       data: { user },

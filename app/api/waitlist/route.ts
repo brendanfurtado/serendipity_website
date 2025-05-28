@@ -1,3 +1,4 @@
+// app/api/waitlist/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/libs/resend";
 import { createClient } from "@/libs/supabase/server";
@@ -34,8 +35,8 @@ export async function POST(req: NextRequest) {
     // you might use a geolocation service instead of storing raw IP)
     const country = headers.get("cf-ipcountry") || null; // Cloudflare provides this
 
-    // Store the submission using our function
-    const supabase = await createClient(); // Add await here
+    // Store the submission using our function - Await the createClient function
+    const supabase = await createClient();
     const { data: signupData, error: signupError } = await supabase.rpc(
       "add_waitlist_signup",
       {

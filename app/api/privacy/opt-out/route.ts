@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Await the createClient function since it returns a Promise
     const supabase = await createClient();
     let marketingResult;
 
@@ -105,6 +106,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Await the createClient function since it returns a Promise
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("get_opt_out_status", {
       p_email: email,

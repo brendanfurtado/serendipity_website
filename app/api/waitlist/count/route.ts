@@ -1,9 +1,11 @@
+// app/api/waitlist/count/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/libs/supabase/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient(); // Add await here
+    // Await the createClient function since it returns a Promise
+    const supabase = await createClient();
 
     // Call the stored function to get the count
     const { data, error } = await supabase.rpc("get_signup_count");

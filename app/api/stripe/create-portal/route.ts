@@ -1,10 +1,12 @@
+// app/api/stripe/create-portal/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/libs/supabase/server";
 import { createCustomerPortal } from "@/libs/stripe";
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createClient();
+    // Await the createClient function since it returns a Promise
+    const supabase = await createClient();
 
     const body = await req.json();
 

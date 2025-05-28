@@ -1,3 +1,4 @@
+// app/api/auth/callback/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@/libs/supabase/server";
 import config from "@/config";
@@ -10,7 +11,8 @@ export async function GET(req: NextRequest) {
   const code = requestUrl.searchParams.get("code");
 
   if (code) {
-    const supabase = createClient();
+    // Await the createClient function since it returns a Promise
+    const supabase = await createClient();
     await supabase.auth.exchangeCodeForSession(code);
   }
 

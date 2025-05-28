@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Submit the request using our Supabase function
+    // Submit the request using our Supabase function - Await the createClient function
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("submit_privacy_request", {
       p_email: email,
