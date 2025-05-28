@@ -1,33 +1,44 @@
+// app/blog/category/[categoryId]/page.tsx
 import { categories, articles } from "../../_assets/content";
 import CardArticle from "../../_assets/components/CardArticle";
 import CardCategory from "../../_assets/components/CardCategory";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { categoryId: string };
-}) {
-  const category = categories.find(
-    (category) => category.slug === params.categoryId
-  );
+// Updated interface for Next.js 15 async params
+interface PageProps {
+  params: Promise<{ categoryId: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  // Await the params Promise
+  const { categoryId } = await params;
+  const category = categories.find((category) => category.slug === categoryId);
 
   return getSEOTags({
-    title: `${category.title} | Blog by ${config.appName}`,
-    description: category.description,
-    canonicalUrlRelative: `/blog/category/${category.slug}`,
+    title: `${category?.title || "Category"} | Blog by ${config.appName}`,
+    description: category?.description || "Blog category page",
+    canonicalUrlRelative: `/blog/category/${categoryId}`,
   });
 }
 
-export default async function Category({
-  params,
-}: {
-  params: { categoryId: string };
-}) {
-  const category = categories.find(
-    (category) => category.slug === params.categoryId
-  );
+export default async function Category({ params }: PageProps) {
+  // Await the params Promise
+  const { categoryId } = await params;
+  const category = categories.find((category) => category.slug === categoryId);
+
+  // Handle case where category is not found
+  if (!category) {
+    return (
+      <div className="max-w-3xl mx-auto text-center py-12">
+        <h1 className="text-3xl font-bold mb-4">Category Not Found</h1>
+        <p className="text-gray-600">
+          The category you're looking for could not be found.
+        </p>
+      </div>
+    );
+  }
+
   const articlesInCategory = articles
     .filter((article) =>
       article.categories.map((c) => c.slug).includes(category.slug)

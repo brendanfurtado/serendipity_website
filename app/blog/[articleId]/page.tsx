@@ -8,12 +8,15 @@ import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 import { notFound } from "next/navigation";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { articleId: string };
-}) {
-  const article = articles.find((article) => article.slug === params.articleId);
+// Updated interface for Next.js 15 async params
+interface PageProps {
+  params: Promise<{ articleId: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  // Await the params Promise
+  const { articleId } = await params;
+  const article = articles.find((article) => article.slug === articleId);
 
   // If article not found, return default metadata
   if (!article) {
@@ -47,12 +50,10 @@ export async function generateMetadata({
   });
 }
 
-export default async function Article({
-  params,
-}: {
-  params: { articleId: string };
-}) {
-  const article = articles.find((article) => article.slug === params.articleId);
+export default async function Article({ params }: PageProps) {
+  // Await the params Promise
+  const { articleId } = await params;
+  const article = articles.find((article) => article.slug === articleId);
 
   // If article not found, show 404 page
   if (!article) {
@@ -63,7 +64,7 @@ export default async function Article({
   const articlesRelated = articles
     .filter(
       (a) =>
-        a.slug !== params.articleId &&
+        a.slug !== articleId &&
         a.categories.some((c) =>
           article.categories.map((c) => c.slug).includes(c.slug)
         )

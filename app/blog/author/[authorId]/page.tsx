@@ -1,29 +1,46 @@
+// app/blog/author/[authorId]/page.tsx
 import Image from "next/image";
 import { authors, articles } from "../../_assets/content";
 import CardArticle from "../../_assets/components/CardArticle";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { authorId: string };
-}) {
-  const author = authors.find((author) => author.slug === params.authorId);
+// Updated interface for Next.js 15 async params
+interface PageProps {
+  params: Promise<{ authorId: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  // Await the params Promise
+  const { authorId } = await params;
+  const author = authors.find((author) => author.slug === authorId);
 
   return getSEOTags({
-    title: `${author.name}, Author at ${config.appName}'s Blog`,
-    description: `${author.name}, Author at ${config.appName}'s Blog`,
-    canonicalUrlRelative: `/blog/author/${author.slug}`,
+    title: `${author?.name || "Author"}, Author at ${config.appName}'s Blog`,
+    description: `${author?.name || "Author"}, Author at ${
+      config.appName
+    }'s Blog`,
+    canonicalUrlRelative: `/blog/author/${authorId}`,
   });
 }
 
-export default async function Author({
-  params,
-}: {
-  params: { authorId: string };
-}) {
-  const author = authors.find((author) => author.slug === params.authorId);
+export default async function Author({ params }: PageProps) {
+  // Await the params Promise
+  const { authorId } = await params;
+  const author = authors.find((author) => author.slug === authorId);
+
+  // Handle case where author is not found
+  if (!author) {
+    return (
+      <div className="max-w-3xl mx-auto text-center py-12">
+        <h1 className="text-3xl font-bold mb-4">Author Not Found</h1>
+        <p className="text-gray-600">
+          The author you're looking for could not be found.
+        </p>
+      </div>
+    );
+  }
+
   const articlesByAuthor = articles
     .filter((article) => article.author.slug === author.slug)
     .sort(
