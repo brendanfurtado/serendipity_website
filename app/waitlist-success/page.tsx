@@ -1,14 +1,15 @@
+// app/waitlist-success/page.tsx
 "use client";
 
-import { useEffect } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import config from "@/config";
 import { Twitter, Instagram, Users } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
-export default function WaitlistSuccess() {
-  // Use the search params hook to get the total count
+// Separate component that uses useSearchParams
+function WaitlistSuccessContent() {
   const searchParams = useSearchParams();
   const totalSignups = searchParams?.get("total")
     ? parseInt(searchParams.get("total")!, 10)
@@ -140,5 +141,53 @@ export default function WaitlistSuccess() {
         </div>
       </div>
     </main>
+  );
+}
+
+// Loading component for Suspense fallback
+function WaitlistSuccessLoading() {
+  return (
+    <main className="min-h-screen py-12 md:py-24 bg-white">
+      <div className="container px-4 md:px-6 max-w-3xl mx-auto">
+        <div className="bg-gradient-to-r from-rose-50 to-violet-50 rounded-2xl p-8 md:p-12 text-center">
+          <div className="mx-auto h-20 w-20 rounded-full bg-gradient-to-r from-rose-300 to-violet-300 flex items-center justify-center mb-6">
+            <svg
+              className="h-10 w-10 text-white animate-spin"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tighter md:text-4xl mb-4">
+            Loading...
+          </h1>
+          <p className="text-gray-600 md:text-lg mb-4">
+            Please wait while we prepare your confirmation.
+          </p>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+// Main component with Suspense boundary
+export default function WaitlistSuccess() {
+  return (
+    <Suspense fallback={<WaitlistSuccessLoading />}>
+      <WaitlistSuccessContent />
+    </Suspense>
   );
 }
