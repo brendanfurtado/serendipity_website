@@ -38,7 +38,7 @@ export const categories: categoryType[] = [
     titleShort: "Features",
     // The description of the category to display in the category page. Up to 160 characters.
     description:
-      "Here are the latest features we've added to ShipFast. I'm constantly improving our product to help you ship faster.",
+      "Here are the latest features we've added to the app. I'm constantly improving our product to help you ship faster.",
     // A short version of the description above, only displayed in the <Header /> on mobile. Up to 60 characters.
     descriptionShort: "Latest features added to Serendity Dating.",
   },
