@@ -3,12 +3,25 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  validateEmail,
+  validateOptOutType,
+  validateText,
+  INPUT_LIMITS,
+} from "@/utils/inputValidation";
 
 type OptOutType = "marketing" | "all";
 
 interface OptOutFormProps {
   initialEmail?: string;
   compact?: boolean;
+}
+
+interface FormErrors {
+  email?: string;
+  optOutType?: string;
+  additionalInfo?: string;
+  general?: string;
 }
 
 export default function OptOutForm({
@@ -20,14 +33,128 @@ export default function OptOutForm({
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const router = useRouter();
+
+  // Allowed opt-out types (prevent injection through select manipulation)
+  const allowedOptOutTypes = ["marketing", "all"] as const;
+
+  // Real-time email validation
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // Prevent input if exceeding length limit
+    if (value.length > INPUT_LIMITS.EMAIL) {
+      return;
+    }
+
+    setEmail(value);
+
+    // Clear email error if user is typing
+    if (errors.email) {
+      setErrors((prev) => ({ ...prev, email: undefined }));
+    }
+  };
+
+  // Real-time validation for additional info
+  const handleAdditionalInfoChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const value = e.target.value;
+
+    // Prevent input if exceeding length limit
+    if (value.length > INPUT_LIMITS.ADDITIONAL_INFO) {
+      return;
+    }
+
+    setAdditionalInfo(value);
+
+    // Clear error if user is typing
+    if (errors.additionalInfo) {
+      setErrors((prev) => ({ ...prev, additionalInfo: undefined }));
+    }
+  };
+
+  // Opt-out type validation
+  const handleOptOutTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as OptOutType;
+
+    // Validate against allowed options (prevent injection)
+    if (!allowedOptOutTypes.includes(value)) {
+      setErrors((prev) => ({
+        ...prev,
+        optOutType: "Invalid opt-out type selected",
+      }));
+      return;
+    }
+
+    setOptOutType(value);
+
+    // Clear error
+    if (errors.optOutType) {
+      setErrors((prev) => ({ ...prev, optOutType: undefined }));
+    }
+  };
+
+  // Comprehensive form validation
+  const validateForm = (): { isValid: boolean; sanitizedData?: any } => {
+    const newErrors: FormErrors = {};
+
+    // Validate email
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      newErrors.email = emailValidation.error;
+    }
+
+    // Validate opt-out type
+    const optOutValidation = validateOptOutType(optOutType);
+    if (!optOutValidation.isValid) {
+      newErrors.optOutType = optOutValidation.error;
+    }
+
+    // Validate additional info
+    let sanitizedAdditionalInfo = "";
+    if (additionalInfo.trim()) {
+      const additionalInfoValidation = validateText(additionalInfo, {
+        maxLength: INPUT_LIMITS.ADDITIONAL_INFO,
+        allowHtml: false,
+        required: false,
+      });
+      if (!additionalInfoValidation.isValid) {
+        newErrors.additionalInfo = additionalInfoValidation.error;
+      } else {
+        sanitizedAdditionalInfo = additionalInfoValidation.sanitizedValue || "";
+      }
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      return {
+        isValid: true,
+        sanitizedData: {
+          email: emailValidation.sanitizedValue,
+          optOutType: optOutValidation.sanitizedValue,
+          additionalInfo: sanitizedAdditionalInfo || undefined,
+        },
+      };
+    }
+
+    return { isValid: false };
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
+    setErrors({});
+
+    // Validate form
+    const validation = validateForm();
+    if (!validation.isValid) {
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/privacy/opt-out", {
@@ -35,11 +162,7 @@ export default function OptOutForm({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email,
-          optOutType,
-          additionalInfo,
-        }),
+        body: JSON.stringify(validation.sanitizedData),
       });
 
       const data = await response.json();
@@ -55,11 +178,27 @@ export default function OptOutForm({
         router.push("/opt-out-success");
       }, 2000);
     } catch (err: any) {
-      setError(err.message || "An error occurred. Please try again.");
+      setErrors({
+        general: err.message || "An error occurred. Please try again.",
+      });
       console.error("Error submitting opt-out request:", err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getCharacterCount = (text: string, limit: number) => {
+    const remaining = limit - text.length;
+    const isNearLimit = remaining <= 50;
+    return (
+      <div
+        className={`text-xs mt-1 ${
+          isNearLimit ? "text-red-500" : "text-gray-500"
+        }`}
+      >
+        {text.length}/{limit} characters
+      </div>
+    );
   };
 
   return (
@@ -80,9 +219,9 @@ export default function OptOutForm({
             </>
           )}
 
-          {error && (
+          {errors.general && (
             <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
-              {error}
+              {errors.general}
             </div>
           )}
 
@@ -92,17 +231,27 @@ export default function OptOutForm({
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Email Address
+                Email Address *
               </label>
               <input
                 id="email"
                 type="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-gray-200 px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                onChange={handleEmailChange}
+                maxLength={INPUT_LIMITS.EMAIL}
+                className={`w-full rounded-md border ${
+                  errors.email
+                    ? "border-red-500 ring-red-500"
+                    : "border-gray-200"
+                } px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500`}
                 placeholder="you@example.com"
+                autoComplete="email"
               />
+              {getCharacterCount(email, INPUT_LIMITS.EMAIL)}
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+              )}
             </div>
 
             <div>
@@ -110,18 +259,25 @@ export default function OptOutForm({
                 htmlFor="optOutType"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                What would you like to opt out of?
+                What would you like to opt out of? *
               </label>
               <select
                 id="optOutType"
                 required
                 value={optOutType}
-                onChange={(e) => setOptOutType(e.target.value as OptOutType)}
-                className="w-full rounded-md border border-gray-200 px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                onChange={handleOptOutTypeChange}
+                className={`w-full rounded-md border ${
+                  errors.optOutType
+                    ? "border-red-500 ring-red-500"
+                    : "border-gray-200"
+                } px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500`}
               >
                 <option value="marketing">Marketing Communications</option>
                 <option value="all">All Non-Essential Communications</option>
               </select>
+              {errors.optOutType && (
+                <p className="mt-1 text-sm text-red-500">{errors.optOutType}</p>
+              )}
             </div>
 
             <div>
@@ -134,16 +290,27 @@ export default function OptOutForm({
               <textarea
                 id="additionalInfo"
                 value={additionalInfo}
-                onChange={(e) => setAdditionalInfo(e.target.value)}
-                className="w-full rounded-md border border-gray-200 px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                onChange={handleAdditionalInfoChange}
+                maxLength={INPUT_LIMITS.ADDITIONAL_INFO}
+                className={`w-full rounded-md border ${
+                  errors.additionalInfo
+                    ? "border-red-500 ring-red-500"
+                    : "border-gray-200"
+                } px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500`}
                 rows={compact ? 2 : 3}
                 placeholder="Please provide any additional details about your opt-out preferences..."
               />
+              {getCharacterCount(additionalInfo, INPUT_LIMITS.ADDITIONAL_INFO)}
+              {errors.additionalInfo && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.additionalInfo}
+                </p>
+              )}
             </div>
 
             <button
               type="submit"
-              className="w-full inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-rose-500 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-gradient-to-r hover:from-rose-600 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
+              className="w-full inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-rose-500 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-gradient-to-r hover:from-rose-600 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
               {isLoading ? (

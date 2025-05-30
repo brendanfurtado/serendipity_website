@@ -3,38 +3,96 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/libs/supabase/server";
 import { sendEmail } from "@/libs/resend";
 import config from "@/config";
+import {
+  validatePrivacyRequestForm,
+  INPUT_LIMITS,
+} from "@/utils/inputValidation";
 
-// Define the allowed request types
-const ALLOWED_REQUEST_TYPES = [
-  "access", // Access to their data
-  "delete", // Delete their data
-  "opt-out", // Opt out of marketing
-];
+const ALLOWED_REQUEST_TYPES = ["access", "delete", "opt-out"] as const;
+
+interface ValidationError {
+  field: string;
+  message: string;
+}
+
+/**
+ * Server-side input validation and sanitization - removed since using utils now
+ */
+
+/**
+ * Helper functions moved to utils - keeping only rate limiting here
+ */
+
+/**
+ * Rate limiting check (basic implementation)
+ * In production, consider using Redis or a proper rate limiting service
+ */
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const windowMs = 15 * 60 * 1000; // 15 minutes
+  const maxRequests = 5; // 5 requests per window
+
+  const current = rateLimitMap.get(ip);
+
+  if (!current || now > current.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+    return true;
+  }
+
+  if (current.count >= maxRequests) {
+    return false;
+  }
+
+  current.count++;
+  return true;
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, requestType, additionalInfo } = await req.json();
+    // Extract client IP address properly
+    const forwarded = req.headers.get("x-forwarded-for");
+    const realIp = req.headers.get("x-real-ip");
+    const cfConnectingIp = req.headers.get("cf-connecting-ip"); // Cloudflare
 
-    // Validate email
-    if (!email || !email.includes("@")) {
+    // Get the first IP if x-forwarded-for contains multiple IPs
+    const ip =
+      cfConnectingIp ||
+      realIp ||
+      (forwarded ? forwarded.split(",")[0].trim() : null) ||
+      "unknown";
+
+    // Rate limiting
+    if (!checkRateLimit(ip)) {
       return NextResponse.json(
-        { error: "Valid email is required" },
-        { status: 400 }
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
       );
     }
 
-    // Validate request type
-    if (!requestType || !ALLOWED_REQUEST_TYPES.includes(requestType)) {
+    const body = await req.json();
+
+    // Validate and sanitize input using utils
+    const validation = validatePrivacyRequestForm({
+      email: body.email,
+      requestType: body.requestType,
+      additionalInfo: body.additionalInfo,
+    });
+
+    if (!validation.isValid) {
       return NextResponse.json(
         {
-          error: "Invalid request type",
-          allowedTypes: ALLOWED_REQUEST_TYPES,
+          error: "Validation failed",
+          details: validation.errors,
         },
         { status: 400 }
       );
     }
 
-    // Submit the request using our Supabase function - Await the createClient function
+    const { email, requestType, additionalInfo } = validation.sanitizedData!;
+
+    // Submit the request using our Supabase function
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("submit_privacy_request", {
       p_email: email,
@@ -56,6 +114,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Log the request for security monitoring
+    console.log(
+      `Privacy request submitted: ${requestType} for ${email} from IP: ${ip}`
+    );
+
     // Notify admin of the request
     try {
       await sendEmail({
@@ -68,6 +131,8 @@ export async function POST(req: NextRequest) {
 Email: ${email}
 Request Type: ${requestType}
 Additional Info: ${additionalInfo || "None provided"}
+IP Address: ${ip}
+Timestamp: ${new Date().toISOString()}
 
 Please review this request in the admin dashboard and process it according to our privacy policy guidelines.`,
         html: `
@@ -78,6 +143,8 @@ Please review this request in the admin dashboard and process it according to ou
             <p><strong>Additional Information:</strong> ${
               additionalInfo || "None provided"
             }</p>
+            <p><strong>IP Address:</strong> ${ip}</p>
+            <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
             <p style="margin-top: 20px;">Please review this request in the admin dashboard and process it according to our privacy policy guidelines.</p>
           </div>
         `,

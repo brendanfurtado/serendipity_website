@@ -3,12 +3,24 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  validatePrivacyRequestForm,
+  INPUT_LIMITS,
+  ValidationResult,
+} from "@/utils/inputValidation";
 
 type RequestType = "access" | "delete" | "opt-out";
 
 interface PrivacyRequestFormProps {
   initialEmail?: string;
   compact?: boolean;
+}
+
+interface FormErrors {
+  email?: string;
+  requestType?: string;
+  additionalInfo?: string;
+  general?: string;
 }
 
 export default function PrivacyRequestForm({
@@ -20,14 +32,72 @@ export default function PrivacyRequestForm({
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const router = useRouter();
+
+  // Real-time validation for email
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // Prevent input if exceeding length limit
+    if (value.length > INPUT_LIMITS.EMAIL) {
+      return;
+    }
+
+    setEmail(value);
+
+    // Clear email error if user is typing
+    if (errors.email) {
+      setErrors((prev) => ({ ...prev, email: undefined }));
+    }
+  };
+
+  // Real-time validation for additional info
+  const handleAdditionalInfoChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const value = e.target.value;
+
+    // Prevent input if exceeding length limit (500 chars for privacy requests)
+    if (value.length > 500) {
+      return;
+    }
+
+    setAdditionalInfo(value);
+
+    // Clear error if user is typing
+    if (errors.additionalInfo) {
+      setErrors((prev) => ({ ...prev, additionalInfo: undefined }));
+    }
+  };
+
+  const handleRequestTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setRequestType(e.target.value as RequestType);
+
+    // Clear error if user selects something
+    if (errors.requestType) {
+      setErrors((prev) => ({ ...prev, requestType: undefined }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
+    setErrors({});
+
+    // Comprehensive validation
+    const validation = validatePrivacyRequestForm({
+      email,
+      requestType,
+      additionalInfo: additionalInfo.trim() || undefined,
+    });
+
+    if (!validation.isValid) {
+      setErrors(validation.errors);
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/privacy/request", {
@@ -35,11 +105,7 @@ export default function PrivacyRequestForm({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email,
-          requestType,
-          additionalInfo,
-        }),
+        body: JSON.stringify(validation.sanitizedData),
       });
 
       const data = await response.json();
@@ -55,14 +121,29 @@ export default function PrivacyRequestForm({
         router.push("/privacy-request-success");
       }, 2000);
     } catch (err: any) {
-      setError(err.message || "An error occurred. Please try again.");
+      setErrors({
+        general: err.message || "An error occurred. Please try again.",
+      });
       console.error("Error submitting privacy request:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Render different layouts based on compact prop
+  const getCharacterCount = (text: string, limit: number) => {
+    const remaining = limit - text.length;
+    const isNearLimit = remaining <= 50;
+    return (
+      <div
+        className={`text-xs mt-1 ${
+          isNearLimit ? "text-red-500" : "text-gray-500"
+        }`}
+      >
+        {text.length}/{limit} characters
+      </div>
+    );
+  };
+
   return (
     <div
       className={`bg-white ${
@@ -81,9 +162,9 @@ export default function PrivacyRequestForm({
             </>
           )}
 
-          {error && (
+          {errors.general && (
             <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
-              {error}
+              {errors.general}
             </div>
           )}
 
@@ -93,17 +174,27 @@ export default function PrivacyRequestForm({
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Email Address
+                Email Address *
               </label>
               <input
                 id="email"
                 type="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-gray-200 px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                onChange={handleEmailChange}
+                maxLength={INPUT_LIMITS.EMAIL}
+                className={`w-full rounded-md border ${
+                  errors.email
+                    ? "border-red-500 ring-red-500"
+                    : "border-gray-200"
+                } px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500`}
                 placeholder="you@example.com"
+                autoComplete="email"
               />
+              {getCharacterCount(email, INPUT_LIMITS.EMAIL)}
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+              )}
             </div>
 
             <div>
@@ -111,19 +202,28 @@ export default function PrivacyRequestForm({
                 htmlFor="requestType"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Request Type
+                Request Type *
               </label>
               <select
                 id="requestType"
                 required
                 value={requestType}
-                onChange={(e) => setRequestType(e.target.value as RequestType)}
-                className="w-full rounded-md border border-gray-200 px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                onChange={handleRequestTypeChange}
+                className={`w-full rounded-md border ${
+                  errors.requestType
+                    ? "border-red-500 ring-red-500"
+                    : "border-gray-200"
+                } px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500`}
               >
                 <option value="access">Access My Data</option>
                 <option value="delete">Delete My Data</option>
                 <option value="opt-out">Opt Out of Marketing</option>
               </select>
+              {errors.requestType && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.requestType}
+                </p>
+              )}
             </div>
 
             <div>
@@ -136,16 +236,27 @@ export default function PrivacyRequestForm({
               <textarea
                 id="additionalInfo"
                 value={additionalInfo}
-                onChange={(e) => setAdditionalInfo(e.target.value)}
-                className="w-full rounded-md border border-gray-200 px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                onChange={handleAdditionalInfoChange}
+                maxLength={500}
+                className={`w-full rounded-md border ${
+                  errors.additionalInfo
+                    ? "border-red-500 ring-red-500"
+                    : "border-gray-200"
+                } px-4 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500`}
                 rows={compact ? 2 : 3}
                 placeholder="Please provide any additional details about your request..."
               />
+              {getCharacterCount(additionalInfo, 500)}
+              {errors.additionalInfo && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.additionalInfo}
+                </p>
+              )}
             </div>
 
             <button
               type="submit"
-              className="w-full inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-rose-500 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-gradient-to-r hover:from-rose-600 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
+              className="w-full inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-rose-500 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-gradient-to-r hover:from-rose-600 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
               {isLoading ? (
