@@ -8,7 +8,7 @@ import { EventsSection } from "./EventsSection";
 import { Community } from "./Community";
 import { TransparencySection } from "./TransparencySection";
 import { SignUpForm } from "./SignUpForm";
-import BlogPreview from "./BlogPreview";
+import { BlogPreview } from "./BlogPreview";
 
 export function LandingPage() {
   return (
@@ -20,6 +20,7 @@ export function LandingPage() {
       <Community />
       <TransparencySection />
       <SignUpForm />
+      <BlogPreview />
     </div>
   );
 }

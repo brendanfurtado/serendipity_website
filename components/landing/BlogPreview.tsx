@@ -18,7 +18,8 @@ export function BlogPreview() {
 
   return (
     <section className="w-full py-12 md:py-24 bg-white">
-      <div className="container px-4 md:px-6">
+      {/* FIXED: Added mx-auto and max-w-screen-xl for consistent container sizing */}
+      <div className="container px-4 md:px-6 mx-auto max-w-screen-xl">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
           <div className="inline-block rounded-lg bg-violet-100 px-3 py-1 text-sm text-violet-700">
             Our Blog
