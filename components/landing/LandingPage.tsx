@@ -20,7 +20,6 @@ export function LandingPage() {
       <Community />
       <TransparencySection />
       <SignUpForm />
-      <BlogPreview />
     </div>
   );
 }

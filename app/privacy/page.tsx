@@ -1,4 +1,7 @@
-// app/privacy/page.tsx
+// app/privacy/page.tsx - Updated version with clickable cards
+"use client";
+
+import { useState } from "react";
 import { getSEOTags } from "@/libs/seo";
 import config from "@/config";
 import PrivacyRequestForm from "@/components/PrivacyRequestForm";
@@ -7,14 +10,11 @@ import { Suspense } from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import Footer from "@/components/Footer";
 
-export const metadata = getSEOTags({
-  title: `Privacy Rights | ${config.appName}`,
-  description:
-    "Exercise your privacy rights under GDPR and CCPA. Request access to, deletion of, or changes to your personal data.",
-  canonicalUrlRelative: "/privacy",
-});
+type RequestType = "access" | "delete" | "opt-out";
 
 export default function PrivacyPage() {
+  const [selectedRequestType, setSelectedRequestType] =
+    useState<RequestType>("access");
   return (
     <>
       <Suspense>
@@ -46,39 +46,136 @@ export default function PrivacyPage() {
                 </p>
 
                 <div className="space-y-2">
-                  <Link
-                    href="/privacy"
-                    className="block w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-rose-50 hover:border-rose-200 transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRequestType("access")}
+                    className={`block w-full text-left p-3 rounded-lg border transition-colors ${
+                      selectedRequestType === "access"
+                        ? "border-rose-500 bg-rose-50"
+                        : "border-gray-200 hover:bg-rose-50 hover:border-rose-200"
+                    }`}
                   >
                     <div className="font-medium">Access My Data</div>
                     <div className="text-sm text-gray-600">
                       Request a copy of all data we have about you
                     </div>
-                  </Link>
+                  </button>
 
-                  <Link
-                    href="/privacy"
-                    className="block w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-rose-50 hover:border-rose-200 transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRequestType("delete")}
+                    className={`block w-full text-left p-3 rounded-lg border transition-colors ${
+                      selectedRequestType === "delete"
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                    }`}
                   >
-                    <div className="font-medium">Delete My Data</div>
-                    <div className="text-sm text-gray-600">
-                      Request complete removal from our systems
+                    <div
+                      className={`font-medium flex items-center gap-2 ${
+                        selectedRequestType === "delete"
+                          ? "text-red-800"
+                          : "text-gray-800"
+                      }`}
+                    >
+                      <svg
+                        className={`h-4 w-4 ${
+                          selectedRequestType === "delete"
+                            ? "text-red-600"
+                            : "text-gray-600"
+                        }`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z"
+                        />
+                      </svg>
+                      Delete My Data
                     </div>
-                  </Link>
+                    <div
+                      className={`text-sm ${
+                        selectedRequestType === "delete"
+                          ? "text-red-700"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      <strong>⚠️ Warning:</strong> This will permanently remove
+                      you from our waitlist and delete all your data. You'll
+                      receive an email confirmation before deletion.
+                    </div>
+                  </button>
 
-                  <Link
-                    href="/privacy"
-                    className="block w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-rose-50 hover:border-rose-200 transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRequestType("opt-out")}
+                    className={`block w-full text-left p-3 rounded-lg border transition-colors ${
+                      selectedRequestType === "opt-out"
+                        ? "border-rose-500 bg-rose-50"
+                        : "border-gray-200 hover:bg-rose-50 hover:border-rose-200"
+                    }`}
                   >
                     <div className="font-medium">Opt Out of Marketing</div>
                     <div className="text-sm text-gray-600">
                       Stay on waitlist but stop receiving promotional emails
                     </div>
-                  </Link>
+                  </button>
                 </div>
               </div>
 
-              <PrivacyRequestForm />
+              {/* Important Notice for Deletion */}
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-5 w-5 text-red-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">
+                      Important: Data Deletion Notice
+                    </h3>
+                    <div className="mt-2 text-sm text-red-700">
+                      <p>
+                        Requesting data deletion will{" "}
+                        <strong>
+                          permanently remove you from our waitlist
+                        </strong>
+                        . This action cannot be undone. You will:
+                      </p>
+                      <ul className="mt-2 list-disc list-inside space-y-1">
+                        <li>Lose your position on the waitlist</li>
+                        <li>
+                          No longer receive updates about {config.appName}
+                        </li>
+                        <li>Need to sign up again if you change your mind</li>
+                      </ul>
+                      <p className="mt-2">
+                        If you only want to stop marketing emails, choose "Opt
+                        Out of Marketing" instead.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <PrivacyRequestForm
+                selectedRequestType={selectedRequestType}
+                compact={false}
+              />
             </div>
 
             <div className="bg-gradient-to-r from-rose-50 to-violet-50 p-8 rounded-xl">
@@ -89,15 +186,20 @@ export default function PrivacyPage() {
                   <h3 className="font-semibold text-lg">Right to Access</h3>
                   <p className="text-gray-600">
                     Request a copy of your personal data, including your
-                    waitlist information.
+                    waitlist information and any preferences we've stored.
                   </p>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg">Right to Delete</h3>
+                  <h3 className="font-semibold text-lg text-red-700">
+                    Right to Delete
+                  </h3>
                   <p className="text-gray-600">
-                    Request deletion of your personal data from our waitlist and
-                    systems.
+                    Request permanent deletion of your personal data from our
+                    waitlist and systems.{" "}
+                    <strong className="text-red-600">
+                      This will remove you from the waitlist permanently.
+                    </strong>
                   </p>
                 </div>
 
@@ -107,7 +209,8 @@ export default function PrivacyPage() {
                   </h3>
                   <p className="text-gray-600">
                     Remain on the waitlist but opt out of promotional and
-                    marketing communications.
+                    marketing communications. You'll still receive essential
+                    updates.
                   </p>
                 </div>
               </div>
@@ -143,7 +246,8 @@ export default function PrivacyPage() {
                 </div>
                 <h3 className="font-semibold mb-2">Verification</h3>
                 <p className="text-gray-600 text-sm">
-                  We may contact you to verify your identity if needed.
+                  For deletion requests, you'll receive an email to confirm your
+                  decision. Other requests may require identity verification.
                 </p>
               </div>
 
@@ -154,8 +258,39 @@ export default function PrivacyPage() {
                 <h3 className="font-semibold mb-2">Request Fulfilled</h3>
                 <p className="text-gray-600 text-sm">
                   We'll fulfill your request within the required timeframe
-                  (30-45 days).
+                  (30-45 days for most requests, immediate for confirmed
+                  deletions).
                 </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Help Section */}
+          <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
+            <h3 className="text-xl font-bold mb-4">Need Help Deciding?</h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <h4 className="font-semibold text-blue-800 mb-2">
+                  Choose "Opt Out of Marketing" if:
+                </h4>
+                <ul className="text-blue-700 text-sm space-y-1">
+                  <li>• You want to stay on the waitlist</li>
+                  <li>
+                    • You're interested in {config.appName} but don't want
+                    promotional emails
+                  </li>
+                  <li>• You want to receive launch notifications</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-red-800 mb-2">
+                  Choose "Delete My Data" if:
+                </h4>
+                <ul className="text-red-700 text-sm space-y-1">
+                  <li>• You're no longer interested in {config.appName}</li>
+                  <li>• You want all your data permanently removed</li>
+                  <li>• You don't mind losing your waitlist position</li>
+                </ul>
               </div>
             </div>
           </div>
