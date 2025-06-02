@@ -1,4 +1,5 @@
-// app/api/privacy/request/route.ts - Clean API route without JSX
+// app/api/privacy/request/route.ts - Updated implementation with enhanced logging and email fixes
+
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/libs/supabase/server";
 import { sendEmail } from "@/libs/resend";
@@ -48,9 +49,12 @@ function checkRateLimit(ip: string): boolean {
 
 export async function POST(req: NextRequest) {
   try {
+    // Added detailed logging
+    console.log("[Privacy Request] Starting request processing");
+
     // Validate JWT configuration on startup
     if (!validateJwtConfiguration()) {
-      console.error("JWT configuration invalid");
+      console.error("[Privacy Request] JWT configuration invalid");
       return NextResponse.json(
         { error: "Server configuration error" },
         { status: 500 }
@@ -71,6 +75,7 @@ export async function POST(req: NextRequest) {
 
     // Rate limiting
     if (!checkRateLimit(ip)) {
+      console.warn(`[Privacy Request] Rate limit exceeded for IP: ${ip}`);
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
         { status: 429 }
@@ -78,6 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+    console.log(`[Privacy Request] Request body: ${JSON.stringify(body)}`);
 
     // Validate and sanitize input using utils
     const validation = validatePrivacyRequestForm({
@@ -87,6 +93,11 @@ export async function POST(req: NextRequest) {
     });
 
     if (!validation.isValid) {
+      console.warn(
+        `[Privacy Request] Validation failed: ${JSON.stringify(
+          validation.errors
+        )}`
+      );
       return NextResponse.json(
         {
           error: "Validation failed",
@@ -97,9 +108,16 @@ export async function POST(req: NextRequest) {
     }
 
     const { email, requestType, additionalInfo } = validation.sanitizedData!;
+    console.log(
+      `[Privacy Request] Validated request: ${requestType} for ${email}`
+    );
 
     // Submit the request using our Supabase function
     const supabase = await createClient();
+    console.log(
+      `[Privacy Request] Supabase client created, submitting request`
+    );
+
     const { data, error } = await supabase.rpc("submit_privacy_request", {
       p_email: email,
       p_request_type: requestType,
@@ -108,7 +126,7 @@ export async function POST(req: NextRequest) {
 
     if (error || (data && !data.success)) {
       console.error(
-        "Error submitting privacy request:",
+        `[Privacy Request] Error submitting privacy request:`,
         error || data?.message
       );
       return NextResponse.json(
@@ -121,24 +139,46 @@ export async function POST(req: NextRequest) {
     }
 
     const requestId = data.id;
+    console.log(
+      `[Privacy Request] Request submitted successfully, ID: ${requestId}`
+    );
 
     // Handle deletion requests differently
     if (requestType === "delete") {
-      await handleDeletionRequest(email, requestId, ip, supabase);
+      console.log(`[Privacy Request] Processing deletion request for ${email}`);
+      try {
+        await handleDeletionRequest(email, requestId, ip, supabase);
+        console.log(`[Privacy Request] Deletion request handled successfully`);
+      } catch (err) {
+        console.error(`[Privacy Request] Error in handleDeletionRequest:`, err);
+        // Continue execution but log the error
+      }
     } else {
       // Handle other request types (access, opt-out) as before
-      await handleStandardPrivacyRequest(
-        email,
-        requestType,
-        additionalInfo,
-        ip,
-        requestId
+      console.log(
+        `[Privacy Request] Processing standard request: ${requestType}`
       );
+      try {
+        await handleStandardPrivacyRequest(
+          email,
+          requestType,
+          additionalInfo,
+          ip,
+          requestId
+        );
+        console.log(`[Privacy Request] Standard request handled successfully`);
+      } catch (err) {
+        console.error(
+          `[Privacy Request] Error in handleStandardPrivacyRequest:`,
+          err
+        );
+        // Continue execution but log the error
+      }
     }
 
     // Log the request for security monitoring
     console.log(
-      `Privacy request submitted: ${requestType} for ${email} from IP: ${ip}`
+      `[Privacy Request] Privacy request submitted: ${requestType} for ${email} from IP: ${ip}`
     );
 
     // Return success response with appropriate message
@@ -153,7 +193,7 @@ export async function POST(req: NextRequest) {
       requestId: requestId,
     });
   } catch (error) {
-    console.error("Error processing privacy request:", error);
+    console.error("[Privacy Request] Unhandled error:", error);
     return NextResponse.json(
       { error: "Failed to process privacy request" },
       { status: 500 }
@@ -171,26 +211,51 @@ async function handleDeletionRequest(
   supabase: any
 ): Promise<void> {
   try {
+    console.log(
+      `[Deletion Request] Starting for ${email}, request ID: ${requestId}`
+    );
+
     // Check if user exists in waitlist (for logging, but don't reveal to user)
-    const { data: userExists } = await supabase
+    const { data: userExists, error: userCheckError } = await supabase
       .from("waitlist")
       .select("id")
       .eq("email", email)
       .single();
 
-    // Log deletion attempt for non-existent users
-    if (!userExists) {
-      console.log(
-        `Deletion request for non-existent user: ${email} from IP: ${ip}`
+    if (userCheckError) {
+      console.warn(
+        `[Deletion Request] Error checking if user exists:`,
+        userCheckError
       );
     }
 
+    // Log deletion attempt for non-existent users
+    if (!userExists) {
+      console.log(
+        `[Deletion Request] Request for non-existent user: ${email} from IP: ${ip}`
+      );
+    } else {
+      console.log(`[Deletion Request] User exists, ID: ${userExists.id}`);
+    }
+
     // Generate JWT token for confirmation (2 hours expiry)
+    console.log(`[Deletion Request] Generating token for ${email}`);
     const token = await generateDeletionToken(email, requestId, 2);
+    console.log(
+      `[Deletion Request] Token generated successfully: ${token.substring(
+        0,
+        10
+      )}...`
+    );
+
     const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours from now
 
     // Create deletion confirmation record (only if user exists)
     if (userExists) {
+      console.log(
+        `[Deletion Request] Creating confirmation record in database`
+      );
+
       const { data: confirmationData, error: confirmationError } =
         await supabase.rpc("create_deletion_confirmation", {
           p_email: email,
@@ -202,32 +267,61 @@ async function handleDeletionRequest(
 
       if (confirmationError || !confirmationData?.success) {
         console.error(
-          "Error creating deletion confirmation:",
+          "[Deletion Request] Error creating deletion confirmation:",
           confirmationError || confirmationData
         );
 
         // Check if it's a pending request or rate limit issue
         if (confirmationData?.error === "pending_request") {
-          throw new Error(
-            "A deletion request is already pending for this email address."
+          console.warn(
+            `[Deletion Request] A deletion request is already pending for ${email}`
           );
         } else if (confirmationData?.error === "rate_limit_exceeded") {
-          throw new Error(
-            "Too many deletion requests from this location. Please try again in 24 hours."
+          console.warn(
+            `[Deletion Request] Rate limit exceeded for ${email} from IP: ${ip}`
           );
-        } else {
-          throw new Error("Failed to create deletion confirmation");
         }
+      } else {
+        console.log(
+          `[Deletion Request] Confirmation record created successfully`
+        );
       }
 
       // Send confirmation email
-      await sendDeletionConfirmationEmail(email, token);
+      console.log(`[Deletion Request] Sending confirmation email to ${email}`);
+      try {
+        await sendDeletionConfirmationEmail(email, token);
+        console.log(
+          `[Deletion Request] Confirmation email sent successfully to ${email}`
+        );
+      } catch (emailError) {
+        console.error(
+          `[Deletion Request] Error sending confirmation email:`,
+          emailError
+        );
+        throw new Error(
+          `Failed to send deletion confirmation email: ${emailError.message}`
+        );
+      }
+    } else {
+      console.log(
+        `[Deletion Request] User doesn't exist, skipping confirmation record creation`
+      );
     }
 
     // Always send admin notification (whether user exists or not)
-    await sendAdminDeletionNotification(email, requestId, ip, !!userExists);
+    console.log(`[Deletion Request] Sending admin notification`);
+    try {
+      await sendAdminDeletionNotification(email, requestId, ip, !!userExists);
+      console.log(`[Deletion Request] Admin notification sent successfully`);
+    } catch (emailError) {
+      console.error(
+        `[Deletion Request] Error sending admin notification:`,
+        emailError
+      );
+    }
   } catch (error) {
-    console.error("Error handling deletion request:", error);
+    console.error("[Deletion Request] Error handling deletion request:", error);
     throw error;
   }
 }
@@ -242,12 +336,23 @@ async function handleStandardPrivacyRequest(
   ip: string,
   requestId: string
 ): Promise<void> {
+  console.log(
+    `[Standard Request] Processing ${requestType} request for ${email}`
+  );
+
   // Notify admin of the request
   try {
+    console.log(`[Standard Request] Sending admin notification`);
+    const adminEmail =
+      config.resend.supportEmail ||
+      (config.resend.fromAdmin.includes("<")
+        ? config.resend.fromAdmin.split("<")[1].replace(">", "")
+        : config.resend.fromAdmin);
+
+    console.log(`[Standard Request] Admin email target: ${adminEmail}`);
+
     await sendEmail({
-      to:
-        config.resend.supportEmail ||
-        config.resend.fromAdmin.split("<")[1].replace(">", ""),
+      to: adminEmail,
       subject: `Privacy Request: ${requestType}`,
       text: `New privacy request:
         
@@ -273,13 +378,18 @@ Please review this request in the admin dashboard and process it according to ou
       `,
       replyTo: email,
     });
+    console.log(`[Standard Request] Admin notification sent successfully`);
   } catch (emailError) {
-    console.error("Error sending admin notification:", emailError);
-    // Continue processing even if admin email fails
+    console.error(
+      "[Standard Request] Error sending admin notification:",
+      emailError
+    );
+    // Continue with the process even if admin email fails
   }
 
   // Send confirmation to user
   try {
+    console.log(`[Standard Request] Sending confirmation to user ${email}`);
     await sendEmail({
       to: email,
       subject: `Your Privacy Request - ${config.appName}`,
@@ -302,8 +412,12 @@ Please review this request in the admin dashboard and process it according to ou
         </div>
       `,
     });
+    console.log(`[Standard Request] User confirmation sent successfully`);
   } catch (emailError) {
-    console.error("Error sending confirmation email:", emailError);
+    console.error(
+      "[Standard Request] Error sending confirmation email:",
+      emailError
+    );
     // Continue processing even if confirmation email fails
   }
 }
@@ -315,14 +429,20 @@ async function sendDeletionConfirmationEmail(
   email: string,
   token: string
 ): Promise<void> {
+  console.log(`[Deletion Email] Preparing confirmation email for ${email}`);
+
   const baseUrl =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
       : `https://${config.domainName}`;
 
   const confirmationUrl = generateDeletionConfirmationUrl(baseUrl, token);
+  console.log(`[Deletion Email] Confirmation URL: ${confirmationUrl}`);
 
-  await sendEmail({
+  // Added more detailed logging for the email sending process
+  console.log(`[Deletion Email] Calling sendEmail with recipient: ${email}`);
+
+  const result = await sendEmail({
     to: email,
     subject: `Confirm Account Deletion - ${config.appName}`,
     text: `
@@ -393,6 +513,8 @@ If you didn't request this deletion, please contact us at ${
       </div>
     `,
   });
+
+  console.log(`[Deletion Email] Email sent successfully, result:`, result);
 }
 
 /**
@@ -405,10 +527,20 @@ async function sendAdminDeletionNotification(
   userExists: boolean
 ): Promise<void> {
   try {
+    console.log(
+      `[Admin Notification] Preparing deletion notification for admin`
+    );
+
+    const adminEmail =
+      config.resend.supportEmail ||
+      (config.resend.fromAdmin.includes("<")
+        ? config.resend.fromAdmin.split("<")[1].replace(">", "")
+        : config.resend.fromAdmin);
+
+    console.log(`[Admin Notification] Admin email target: ${adminEmail}`);
+
     await sendEmail({
-      to:
-        config.resend.supportEmail ||
-        config.resend.fromAdmin.split("<")[1].replace(">", ""),
+      to: adminEmail,
       subject: `Deletion Request: ${email}`,
       text: `New deletion request received:
         
@@ -443,8 +575,14 @@ Monitor for completion or expiration.`,
       `,
       replyTo: email,
     });
+
+    console.log(`[Admin Notification] Admin notification sent successfully`);
   } catch (emailError) {
-    console.error("Error sending admin deletion notification:", emailError);
+    console.error(
+      "[Admin Notification] Error sending admin deletion notification:",
+      emailError
+    );
+    throw emailError;
   }
 }
 
