@@ -1,7 +1,5 @@
-"use client";
-
 import React from "react";
-import { Users, Shield, BarChart } from "lucide-react";
+import { Users, Shield, BarChart, XCircle } from "lucide-react";
 
 export function HowItWorks() {
   return (
@@ -46,7 +44,7 @@ export function HowItWorks() {
             </p>
           </div>
         </div>
-        <div className="grid gap-6 mt-12 md:grid-cols-3 md:gap-12">
+        <div className="grid gap-6 mt-12 md:grid-cols-2 lg:grid-cols-4 md:gap-8">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-100">
               <Users className="h-8 w-8 text-rose-600" />
@@ -77,6 +75,18 @@ export function HowItWorks() {
             <p className="text-gray-600">
               Discover the joy of unexpected connections through our curated
               events and community-driven experiences.
+            </p>
+          </div>
+          {/* New "No Swiping" feature highlight */}
+          <div className="flex flex-col items-center space-y-4 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-violet-100">
+              <XCircle className="h-8 w-8 text-violet-600" />
+            </div>
+            <h3 className="text-xl font-bold">No Swiping</h3>
+            <p className="text-gray-600">
+              Experience a view unlike any other app to see potential dates in
+              the area, free from the endless swiping that leads to dating
+              fatigue.
             </p>
           </div>
         </div>
