@@ -1,18 +1,7 @@
-import { Suspense } from "react";
-import { LandingPage } from "@/components/landing/LandingPage";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import ClosedNotice from "@/components/ClosedNotice";
 
+// Serendipity has wound down. The landing page now shows a static closed notice.
+// The previous landing page still lives in components/landing/LandingPage if ever needed.
 export default function Home() {
-  return (
-    <>
-      <Suspense>
-        <Header />
-      </Suspense>
-      <main>
-        <LandingPage />
-      </main>
-      <Footer />
-    </>
-  );
+  return <ClosedNotice />;
 }
